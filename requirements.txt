@@ -1,0 +1,8 @@
+streamlit
+pandas
+numpy
+kagglehub
+scikit-learn
+statsmodels
+matplotlib
+altair
