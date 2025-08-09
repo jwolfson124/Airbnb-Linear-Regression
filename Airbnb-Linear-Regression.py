@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2565]:
+# In[2]:
 
 
 ##import the entire dataset in a way where we can just add the next file in with no issues
@@ -32,7 +32,7 @@ st.set_page_config(layout='wide') #make sure we can use the entire streamlit pag
 
 # ## Bring in the data from insideairbnb.com and use the listings.csv.gz
 
-# In[2573]:
+# In[3]:
 
 
 # Path to the "Air BnB Data" folder inside the repo
@@ -80,52 +80,52 @@ print(report_df)
 st.write("App Passed Phase 1")
 
 
-# In[2571]:
+# In[7]:
 
 
 # Step 1: Set the folder path
-#folder_path = "/Users/student/Desktop/Dashboard Work/Linear Model House Pricing/Air BnB Data"
-#excel_files = glob.glob(os.path.join(folder_path, "*.xls"))
+folder_path = "/Users/student/Desktop/Dashboard Work/Linear Model House Pricing/Air BnB Data"
+excel_files = glob.glob(os.path.join(folder_path, "*.xls"))
 
 # Step 2: Find all unique columns across the files
-#all_columns = set()
-#file_columns_map = {}
+all_columns = set()
+file_columns_map = {}
 
-#for file in excel_files:
-#    df = pd.read_excel(file, nrows=1)  # Read header only
-#    file_columns_map[file] = set(df.columns)
-#    all_columns.update(df.columns)
+for file in excel_files:
+    df = pd.read_excel(file, nrows=1)  # Read header only
+    file_columns_map[file] = set(df.columns)
+    all_columns.update(df.columns)
 
-#all_columns = list(all_columns)
+all_columns = list(all_columns)
 
 # Step 3: Load data and align all columns
-#dfs = []
-#missing_column_report = []
+dfs = []
+missing_column_report = []
 
-#for file in excel_files:
-#    df = pd.read_excel(file)
-#    original_cols = set(df.columns)
-#    missing_cols = list(set(all_columns) - original_cols)
+for file in excel_files:
+    df = pd.read_excel(file)
+    original_cols = set(df.columns)
+    missing_cols = list(set(all_columns) - original_cols)
 
     # Reindex with all columns so missing ones are filled with NaN
-#    df = df.reindex(columns=all_columns)
+    df = df.reindex(columns=all_columns)
 
     # Optional: add a column to indicate which file the data came from
-#    df['source_file'] = os.path.basename(file)
-#    dfs.append(df)
+    df['source_file'] = os.path.basename(file)
+    dfs.append(df)
 
     # Track which columns were missing in this file
-#    if missing_cols:
-#        missing_column_report.append({
-#            'file': os.path.basename(file),
-#            'missing_columns': missing_cols
-#        })
+    if missing_cols:
+        missing_column_report.append({
+            'file': os.path.basename(file),
+            'missing_columns': missing_cols
+        })
 
 # Step 4: Combine all into one large DataFrame
-#combined_df = pd.concat(dfs, ignore_index=True)
+combined_df = pd.concat(dfs, ignore_index=True)
 
 # Step 5: Create and print report of missing columns
-#report_df = pd.DataFrame(missing_column_report)
+report_df = pd.DataFrame(missing_column_report)
 
 
 # In[5]:
@@ -136,7 +136,7 @@ st.write("App Passed Phase 1")
 
 # ## Identify columns that are not consistent and remove them from df
 
-# In[2569]:
+# In[33]:
 
 
 #columns to drop
@@ -167,7 +167,7 @@ df = df.drop(columns=column_drop)#, inplace=True)
 
 # # Identify Columns that will not be useful to the algorythm
 
-# In[2198]:
+# In[35]:
 
 
 #remove URL
@@ -202,11 +202,11 @@ st.write('App Passed Phase 2')
 
 # ## Change any datetime columns to integer values
 
-# In[2200]:
+# In[37]:
 
 
 #columns that need to be changed
-display(small_df.select_dtypes(include=['datetime', 'datetime64[ns]', 'datetimetz']).columns)
+print(small_df.select_dtypes(include=['datetime', 'datetime64[ns]', 'datetimetz']).columns)
 
 #change host since to get total days as a host, also remove the NAN values, and drop the old column
 small_df = small_df[~small_df['host_since'].isna()]
@@ -227,7 +227,7 @@ small_df['calendar_last_scraped'] = small_df['calendar_last_scraped'].dt.strftim
 
 # ## Change categorical values into dummy variables
 
-# In[2202]:
+# In[21]:
 
 
 df = small_df.copy()
@@ -247,15 +247,15 @@ df = df.drop(columns='source_file')
 display(df['amenities'])
 
 
-# In[922]:
+# In[23]:
 
 
-df.columns
+#df.columns
 
 
 # ## Use Total Number of Amenities Instead of Individual
 
-# In[2204]:
+# In[25]:
 
 
 #the ast.literal_eval turns the string that holds a list into just a list of the different amenities
