@@ -244,7 +244,7 @@ df['instant_bookable'] = df['instant_bookable'].apply(lambda x: 1 if x == 't' el
 df['city'] = df['source_file'].apply(lambda x: re.search(r"^[^\d]+", x).group().strip())
 df = df.drop(columns='source_file')
 
-display(df['amenities'])
+print(df['amenities'])
 
 
 # In[23]:
@@ -293,7 +293,7 @@ st.write("App Passed Phase 3")
 # In[2208]:
 
 
-df['room_type']
+#df['room_type']
 
 
 # ## Get dummy values and apply prefix to help with organizatioon
