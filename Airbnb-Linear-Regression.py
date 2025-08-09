@@ -26,6 +26,7 @@ import ast
 from sklearn.preprocessing import StandardScaler
 import random
 from statsmodels.stats.outliers_influence import variance_inflation_factor
+from pathlib import Path
 st.set_page_config(layout='wide') #make sure we can use the entire streamlit page
 
 
@@ -33,9 +34,6 @@ st.set_page_config(layout='wide') #make sure we can use the entire streamlit pag
 
 # In[2573]:
 
-
-import pandas as pd
-from pathlib import Path
 
 # Path to the "Air BnB Data" folder inside the repo
 DATA_DIR = Path(__file__).parent / "Air BnB Data"
@@ -199,6 +197,8 @@ small_df = df[keep_columns].copy()
 #enter in latitude and longitude for more specific location pricing
 #currently just using neighbourhood_cleansed
 
+st.write('App Passed Phase 2')
+
 
 # ## Change any datetime columns to integer values
 
@@ -284,6 +284,8 @@ def count_amenities(amenities_str):
 
 #change the amenities list into a count of all amenities
 df['amenities'] = df['amenities'].apply(count_amenities)
+
+st.write("App Passed Phase 3")
 
 
 # ## edit the data so that it will show entire vs shared vs private room as opposed to all the different options
@@ -417,6 +419,8 @@ for quarter in timeline_cols:
             df.loc[miss_mask, f'{col}_missing'] = 1
             df.loc[miss_mask, col] = medians
 
+st.write("App Passed Phase 4")
+
 
 # ## turn all the sparse values into integer or float values
 
@@ -478,6 +482,8 @@ for col in columns_to_check:
 #scale the specific columns
 scaler = StandardScaler()
 df[columns_to_scale] = scaler.fit_transform(df[columns_to_scale])
+
+st.write("App Passed Phase 5")
 
 
 # In[ ]:
@@ -606,6 +612,8 @@ columns_to_drop.append(neighbor_remove)
 columns_to_drop.append(room_remove)
 columns_to_drop.append(calendar_remove)
 
+st.write("App Passed Phase 6")
+
 
 # ## After Making initial edits to alter the nan and inf numbers run until there is no more multicolinearity
 
@@ -669,6 +677,8 @@ def stepwise_selection(x_train, y_train, threshold = 0.05):
 
 model_columns, model = stepwise_selection(x_train_int, y_train_log, threshold=0.05)
 
+st.write("App Passed Phase 7")
+
 
 # ## Test the Model
 
@@ -684,6 +694,9 @@ print("R-Squared of the Test Data:", r2)
 
 mse = root_mean_squared_error(y_test, y_pred)
 print("Mean Squared Error of the Test Data:", mse)
+
+
+st.write("App Passed Phase 8")
 
 
 # In[2026]:
