@@ -31,7 +31,7 @@ st.set_page_config(layout='wide') #make sure we can use the entire streamlit pag
 
 # ## Bring in the data from insideairbnb.com and use the listings.csv.gz
 
-# In[ ]:
+# In[2573]:
 
 
 import pandas as pd
@@ -79,6 +79,7 @@ report_df = pd.DataFrame(missing_column_report)
 print(f"Loaded {len(excel_files)} files from {DATA_DIR}")
 print("Combined shape:", combined_df.shape)
 print(report_df)
+st.write("App Passed Phase 1")
 
 
 # In[2571]:
