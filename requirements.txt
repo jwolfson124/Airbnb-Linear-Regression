@@ -6,3 +6,4 @@ scikit-learn
 statsmodels
 matplotlib
 altair
+xlrd==2.0.1
