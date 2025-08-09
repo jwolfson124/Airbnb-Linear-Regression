@@ -152,7 +152,7 @@ for i, row in report_df.iterrows():
 #make a copy of the combined_df called df
 df = combined_df.copy()
 
-df = df.drop(columns=column_drop, inplace=True)
+df = df.drop(columns=column_drop)#, inplace=True)
 
 #these numbers should reflect removing columns that are not in all of the datasets
 #print(len(df.columns))
