@@ -83,49 +83,49 @@ st.write("App Passed Phase 1")
 # In[7]:
 
 
-# Step 1: Set the folder path
-folder_path = "/Users/student/Desktop/Dashboard Work/Linear Model House Pricing/Air BnB Data"
-excel_files = glob.glob(os.path.join(folder_path, "*.xls"))
+# # Step 1: Set the folder path
+# folder_path = "/Users/student/Desktop/Dashboard Work/Linear Model House Pricing/Air BnB Data"
+# excel_files = glob.glob(os.path.join(folder_path, "*.xls"))
 
-# Step 2: Find all unique columns across the files
-all_columns = set()
-file_columns_map = {}
+# # Step 2: Find all unique columns across the files
+# all_columns = set()
+# file_columns_map = {}
 
-for file in excel_files:
-    df = pd.read_excel(file, nrows=1)  # Read header only
-    file_columns_map[file] = set(df.columns)
-    all_columns.update(df.columns)
+# for file in excel_files:
+#     df = pd.read_excel(file, nrows=1)  # Read header only
+#     file_columns_map[file] = set(df.columns)
+#     all_columns.update(df.columns)
 
-all_columns = list(all_columns)
+# all_columns = list(all_columns)
 
-# Step 3: Load data and align all columns
-dfs = []
-missing_column_report = []
+# # Step 3: Load data and align all columns
+# dfs = []
+# missing_column_report = []
 
-for file in excel_files:
-    df = pd.read_excel(file)
-    original_cols = set(df.columns)
-    missing_cols = list(set(all_columns) - original_cols)
+# for file in excel_files:
+#     df = pd.read_excel(file)
+#     original_cols = set(df.columns)
+#     missing_cols = list(set(all_columns) - original_cols)
 
-    # Reindex with all columns so missing ones are filled with NaN
-    df = df.reindex(columns=all_columns)
+#     # Reindex with all columns so missing ones are filled with NaN
+#     df = df.reindex(columns=all_columns)
 
-    # Optional: add a column to indicate which file the data came from
-    df['source_file'] = os.path.basename(file)
-    dfs.append(df)
+#     # Optional: add a column to indicate which file the data came from
+#     df['source_file'] = os.path.basename(file)
+#     dfs.append(df)
 
-    # Track which columns were missing in this file
-    if missing_cols:
-        missing_column_report.append({
-            'file': os.path.basename(file),
-            'missing_columns': missing_cols
-        })
+#     # Track which columns were missing in this file
+#     if missing_cols:
+#         missing_column_report.append({
+#             'file': os.path.basename(file),
+#             'missing_columns': missing_cols
+#         })
 
-# Step 4: Combine all into one large DataFrame
-combined_df = pd.concat(dfs, ignore_index=True)
+# # Step 4: Combine all into one large DataFrame
+# combined_df = pd.concat(dfs, ignore_index=True)
 
-# Step 5: Create and print report of missing columns
-report_df = pd.DataFrame(missing_column_report)
+# # Step 5: Create and print report of missing columns
+# report_df = pd.DataFrame(missing_column_report)
 
 
 # In[5]:
