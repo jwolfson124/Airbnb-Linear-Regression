@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2275]:
+# In[2565]:
 
 
 ##import the entire dataset in a way where we can just add the next file in with no issues
@@ -31,52 +31,102 @@ st.set_page_config(layout='wide') #make sure we can use the entire streamlit pag
 
 # ## Bring in the data from insideairbnb.com and use the listings.csv.gz
 
-# In[2194]:
+# In[ ]:
 
 
-# Step 1: Set the folder path
-folder_path = "/Users/student/Desktop/Dashboard Work/Linear Model House Pricing/Air BnB Data"
-excel_files = glob.glob(os.path.join(folder_path, "*.xls"))
+import pandas as pd
+from pathlib import Path
 
-# Step 2: Find all unique columns across the files
+# Path to the "Air BnB Data" folder inside the repo
+DATA_DIR = Path(__file__).parent / "Air BnB Data"
+
+# Get all .xls files in that folder
+excel_files = list(DATA_DIR.glob("*.xls"))
+
+# Step 1: Build list of all unique columns across files
 all_columns = set()
-file_columns_map = {}
-
-for file in excel_files:
-    df = pd.read_excel(file, nrows=1)  # Read header only
-    file_columns_map[file] = set(df.columns)
-    all_columns.update(df.columns)
+for file_path in excel_files:
+    df_head = pd.read_excel(file_path, nrows=1, engine="xlrd")
+    all_columns.update(df_head.columns)
 
 all_columns = list(all_columns)
 
-# Step 3: Load data and align all columns
+# Step 2: Load data from each file, align columns, and add source column
 dfs = []
 missing_column_report = []
 
-for file in excel_files:
-    df = pd.read_excel(file)
+for file_path in excel_files:
+    df = pd.read_excel(file_path, engine="xlrd")
     original_cols = set(df.columns)
     missing_cols = list(set(all_columns) - original_cols)
 
-    # Reindex with all columns so missing ones are filled with NaN
     df = df.reindex(columns=all_columns)
-
-    # Optional: add a column to indicate which file the data came from
-    df['source_file'] = os.path.basename(file)
+    df["source_file"] = file_path.name
     dfs.append(df)
 
-    # Track which columns were missing in this file
     if missing_cols:
         missing_column_report.append({
-            'file': os.path.basename(file),
-            'missing_columns': missing_cols
+            "file": file_path.name,
+            "missing_columns": sorted(missing_cols)
         })
 
-# Step 4: Combine all into one large DataFrame
+# Step 3: Combine all into one DataFrame
 combined_df = pd.concat(dfs, ignore_index=True)
 
-# Step 5: Create and print report of missing columns
+# Step 4: Optional report
 report_df = pd.DataFrame(missing_column_report)
+
+print(f"Loaded {len(excel_files)} files from {DATA_DIR}")
+print("Combined shape:", combined_df.shape)
+print(report_df)
+
+
+# In[2571]:
+
+
+# Step 1: Set the folder path
+#folder_path = "/Users/student/Desktop/Dashboard Work/Linear Model House Pricing/Air BnB Data"
+#excel_files = glob.glob(os.path.join(folder_path, "*.xls"))
+
+# Step 2: Find all unique columns across the files
+#all_columns = set()
+#file_columns_map = {}
+
+#for file in excel_files:
+#    df = pd.read_excel(file, nrows=1)  # Read header only
+#    file_columns_map[file] = set(df.columns)
+#    all_columns.update(df.columns)
+
+#all_columns = list(all_columns)
+
+# Step 3: Load data and align all columns
+#dfs = []
+#missing_column_report = []
+
+#for file in excel_files:
+#    df = pd.read_excel(file)
+#    original_cols = set(df.columns)
+#    missing_cols = list(set(all_columns) - original_cols)
+
+    # Reindex with all columns so missing ones are filled with NaN
+#    df = df.reindex(columns=all_columns)
+
+    # Optional: add a column to indicate which file the data came from
+#    df['source_file'] = os.path.basename(file)
+#    dfs.append(df)
+
+    # Track which columns were missing in this file
+#    if missing_cols:
+#        missing_column_report.append({
+#            'file': os.path.basename(file),
+#            'missing_columns': missing_cols
+#        })
+
+# Step 4: Combine all into one large DataFrame
+#combined_df = pd.concat(dfs, ignore_index=True)
+
+# Step 5: Create and print report of missing columns
+#report_df = pd.DataFrame(missing_column_report)
 
 
 # In[5]:
@@ -87,7 +137,7 @@ report_df = pd.DataFrame(missing_column_report)
 
 # ## Identify columns that are not consistent and remove them from df
 
-# In[2196]:
+# In[2569]:
 
 
 #columns to drop
@@ -103,7 +153,7 @@ for i, row in report_df.iterrows():
 #make a copy of the combined_df called df
 df = combined_df.copy()
 
-df.drop(columns=column_drop, inplace=True)
+df = df.drop(columns=column_drop, inplace=True)
 
 #these numbers should reflect removing columns that are not in all of the datasets
 #print(len(df.columns))
