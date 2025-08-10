@@ -572,6 +572,20 @@ columns_to_drop = []
 for col, val in vif_data.items():
     if not np.isfinite(val):
         columns_to_drop.append(col)
+
+if "x_train_int" not in locals():
+    st.error("x_train_int is not defined — check earlier steps.")
+    st.stop()
+
+try:
+    vif_data = vif_calc(x_train_int, drop_const=True)
+except Exception as e:
+    st.error(f"VIF calculation failed: {e}")
+    st.stop()
+
+columns_to_drop = [c for c, v in vif_data.items() if not np.isfinite(v)]
+#st.write("Phase Pass 5.5")
+
 st.write("Phase Pass 5.5")
 
 
