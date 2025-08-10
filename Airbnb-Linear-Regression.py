@@ -517,6 +517,7 @@ y_test_log = np.log(y_test)
 #add in an intercept to design matrices
 x_train_int = sm.add_constant(x_train, has_constant='add')
 x_test_int = sm.add_constant(x_test, has_constant='add')
+st.write("Train Test Split Complete")
 
 #x_train_int.columns.str.contains('const')
 
@@ -649,7 +650,7 @@ while True:
 
 x_train_int = x_train_int[x_vif_train.columns]
 x_test_int = x_test_int[x_vif_train.columns]
-
+st.write("All VIF Work Complete")
 
 # In[ ]:
 
