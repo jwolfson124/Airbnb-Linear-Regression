@@ -324,9 +324,6 @@ timeline_cols = df.columns[df.columns.str.contains('calendar')]
 # In[2214]:
 
 
-df
-
-
 # ## identify missing data and how to deal with it the means, medians, max, and min to understand how similar the information is
 
 # In[2216]:
