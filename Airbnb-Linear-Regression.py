@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
+# In[48]:
 
 
 ##import the entire dataset in a way where we can just add the next file in with no issues
@@ -32,7 +32,7 @@ st.set_page_config(layout='wide') #make sure we can use the entire streamlit pag
 
 # ## Bring in the data from insideairbnb.com and use the listings.csv.gz
 
-# In[3]:
+# In[50]:
 
 
 # Path to the "Air BnB Data" folder inside the repo
@@ -80,52 +80,52 @@ print(report_df)
 st.write("App Passed Phase 1")
 
 
-# In[7]:
+# In[52]:
 
 
-# # Step 1: Set the folder path
-# folder_path = "/Users/student/Desktop/Dashboard Work/Linear Model House Pricing/Air BnB Data"
-# excel_files = glob.glob(os.path.join(folder_path, "*.xls"))
+# Step 1: Set the folder path
+folder_path = "/Users/student/Desktop/Dashboard Work/Linear Model House Pricing/Air BnB Data"
+excel_files = glob.glob(os.path.join(folder_path, "*.xls"))
 
-# # Step 2: Find all unique columns across the files
-# all_columns = set()
-# file_columns_map = {}
+# Step 2: Find all unique columns across the files
+all_columns = set()
+file_columns_map = {}
 
-# for file in excel_files:
-#     df = pd.read_excel(file, nrows=1)  # Read header only
-#     file_columns_map[file] = set(df.columns)
-#     all_columns.update(df.columns)
+for file in excel_files:
+    df = pd.read_excel(file, nrows=1)  # Read header only
+    file_columns_map[file] = set(df.columns)
+    all_columns.update(df.columns)
 
-# all_columns = list(all_columns)
+all_columns = list(all_columns)
 
-# # Step 3: Load data and align all columns
-# dfs = []
-# missing_column_report = []
+# Step 3: Load data and align all columns
+dfs = []
+missing_column_report = []
 
-# for file in excel_files:
-#     df = pd.read_excel(file)
-#     original_cols = set(df.columns)
-#     missing_cols = list(set(all_columns) - original_cols)
+for file in excel_files:
+    df = pd.read_excel(file)
+    original_cols = set(df.columns)
+    missing_cols = list(set(all_columns) - original_cols)
 
-#     # Reindex with all columns so missing ones are filled with NaN
-#     df = df.reindex(columns=all_columns)
+    # Reindex with all columns so missing ones are filled with NaN
+    df = df.reindex(columns=all_columns)
 
-#     # Optional: add a column to indicate which file the data came from
-#     df['source_file'] = os.path.basename(file)
-#     dfs.append(df)
+    # Optional: add a column to indicate which file the data came from
+    df['source_file'] = os.path.basename(file)
+    dfs.append(df)
 
-#     # Track which columns were missing in this file
-#     if missing_cols:
-#         missing_column_report.append({
-#             'file': os.path.basename(file),
-#             'missing_columns': missing_cols
-#         })
+    # Track which columns were missing in this file
+    if missing_cols:
+        missing_column_report.append({
+            'file': os.path.basename(file),
+            'missing_columns': missing_cols
+        })
 
-# # Step 4: Combine all into one large DataFrame
-# combined_df = pd.concat(dfs, ignore_index=True)
+# Step 4: Combine all into one large DataFrame
+combined_df = pd.concat(dfs, ignore_index=True)
 
-# # Step 5: Create and print report of missing columns
-# report_df = pd.DataFrame(missing_column_report)
+# Step 5: Create and print report of missing columns
+report_df = pd.DataFrame(missing_column_report)
 
 
 # In[5]:
@@ -136,7 +136,7 @@ st.write("App Passed Phase 1")
 
 # ## Identify columns that are not consistent and remove them from df
 
-# In[33]:
+# In[53]:
 
 
 #columns to drop
@@ -167,7 +167,7 @@ df = df.drop(columns=column_drop)#, inplace=True)
 
 # # Identify Columns that will not be useful to the algorythm
 
-# In[35]:
+# In[56]:
 
 
 #remove URL
@@ -202,7 +202,7 @@ st.write('App Passed Phase 2')
 
 # ## Change any datetime columns to integer values
 
-# In[37]:
+# In[58]:
 
 
 #columns that need to be changed
@@ -227,7 +227,7 @@ small_df['calendar_last_scraped'] = small_df['calendar_last_scraped'].dt.strftim
 
 # ## Change categorical values into dummy variables
 
-# In[21]:
+# In[60]:
 
 
 df = small_df.copy()
@@ -255,7 +255,7 @@ print(df['amenities'])
 
 # ## Use Total Number of Amenities Instead of Individual
 
-# In[25]:
+# In[62]:
 
 
 #the ast.literal_eval turns the string that holds a list into just a list of the different amenities
@@ -267,7 +267,7 @@ df['amenities'] = df['amenities'].apply(ast.literal_eval).apply(lambda x: ','.jo
 #df_dummies
 
 
-# In[2206]:
+# In[64]:
 
 
 def count_amenities(amenities_str):
@@ -298,7 +298,7 @@ st.write("App Passed Phase 3")
 
 # ## Get dummy values and apply prefix to help with organizatioon
 
-# In[2210]:
+# In[66]:
 
 
 #create a list of dummy columns
@@ -314,19 +314,22 @@ dummy_values = pd.get_dummies(df[dummy_cols],prefix=prefix, dtype='uint8', spars
 df = pd.concat([df, dummy_values], axis=1).drop(columns=dummy_cols)
 
 
-# In[2212]:
+# In[44]:
 
 
 timeline_cols = df.columns[df.columns.str.contains('calendar')]
 #timeline_cols
 
 
-# In[2214]:
+# In[ ]:
+
+
+
 
 
 # ## identify missing data and how to deal with it the means, medians, max, and min to understand how similar the information is
 
-# In[2216]:
+# In[68]:
 
 
 #remove all instances of missing price
@@ -386,7 +389,7 @@ for quarter in timeline_cols:
 
 # ## Based on the above analysis it makes sense to impute the data using the median values for each calendar time period year
 
-# In[2220]:
+# In[70]:
 
 
 #create the columns that will hold the missing values and mark them before imputing the median
@@ -421,7 +424,7 @@ st.write("App Passed Phase 4")
 
 # ## turn all the sparse values into integer or float values
 
-# In[2337]:
+# In[72]:
 
 
 #check the dtypes and confirm there are no strings
@@ -438,7 +441,7 @@ for col in column_list:
 
 # ## remove major outliers
 
-# In[2224]:
+# In[74]:
 
 
 #create the upper and lower bounds
@@ -452,7 +455,7 @@ df = df[mask].copy()
 
 # ## scale non-binary features
 
-# In[2226]:
+# In[76]:
 
 
 #remove price
@@ -501,7 +504,7 @@ st.write("App Passed Phase 5")
 
 # ## create a function that will run through the different models and once all values are statistically significant return the model information
 
-# In[2492]:
+# In[78]:
 
 
 #set the random seed
@@ -530,11 +533,10 @@ x_test_int = sm.add_constant(x_test, has_constant='add')
 
 # ## Test for Multi Colinearity
 
-# In[2494]:
+# In[91]:
 
 
 def vif_calc(x_train_int, exclude_const = True):
-    exclude_const = True
     
     #remove the constant
     if exclude_const == True and 'const' in x_train_int.columns:
@@ -549,7 +551,8 @@ def vif_calc(x_train_int, exclude_const = True):
         vif_data[column] = vif
 
     return vif_data
-       
+
+vif_data = vif_calc(x_train_int)
 
 
 # In[ ]:
@@ -558,7 +561,7 @@ def vif_calc(x_train_int, exclude_const = True):
 ## Identify issues and rerun VIF again
 
 
-# In[2498]:
+# In[98]:
 
 
 columns_to_drop = []
@@ -610,16 +613,15 @@ columns_to_drop.append(room_remove)
 columns_to_drop.append(calendar_remove)
 
 st.write("App Passed Phase 6")
+print(columns_to_drop)
 
 
 # ## After Making initial edits to alter the nan and inf numbers run until there is no more multicolinearity
 
-# In[2563]:
+# In[101]:
 
 
-columns_to_drop = []
-
-x_vif_train = x_train_int.copy()
+x_vif_train = x_train_int.drop(columns=columns_to_drop).copy()
 #use the vif function to get a dictionary of all vif
 
 while True:
@@ -652,7 +654,7 @@ while True:
 
 # ## Build the Model
 
-# In[2268]:
+# In[103]:
 
 
 def stepwise_selection(x_train, y_train, threshold = 0.05):
@@ -679,7 +681,7 @@ st.write("App Passed Phase 7")
 
 # ## Test the Model
 
-# In[2272]:
+# In[105]:
 
 
 #predict based on the model
