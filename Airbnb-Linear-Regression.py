@@ -530,6 +530,7 @@ st.write("Train Test Split Complete")
 def vif_calc(x_train_int, exclude_const = True):
     
     #remove the constant
+    i = 1
     if exclude_const == True and 'const' in x_train_int.columns:
         df_vif = x_train_int.drop('const', axis = 1)
     else:
@@ -546,6 +547,9 @@ def vif_calc(x_train_int, exclude_const = True):
         except:
             # Handle any calculation errors
             vif_data[column] = np.nan
+        finally:
+            st.write(f"Iteration of VIF {i} Complete")
+            i += 1
 
     return vif_data
 
