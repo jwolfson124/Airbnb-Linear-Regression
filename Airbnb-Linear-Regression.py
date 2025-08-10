@@ -28,7 +28,7 @@ import random
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from pathlib import Path
 st.set_page_config(layout='wide') #make sure we can use the entire streamlit page
-
+st.write('hello')
 
 # ## Bring in the data from insideairbnb.com and use the listings.csv.gz
 
