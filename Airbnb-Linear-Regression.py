@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[48]:
+# In[107]:
 
 
 ##import the entire dataset in a way where we can just add the next file in with no issues
@@ -80,7 +80,7 @@ print(report_df)
 st.write("App Passed Phase 1")
 
 
-# In[52]:
+# In[109]:
 
 
 # Step 1: Set the folder path
@@ -136,7 +136,7 @@ report_df = pd.DataFrame(missing_column_report)
 
 # ## Identify columns that are not consistent and remove them from df
 
-# In[53]:
+# In[110]:
 
 
 #columns to drop
@@ -167,7 +167,7 @@ df = df.drop(columns=column_drop)#, inplace=True)
 
 # # Identify Columns that will not be useful to the algorythm
 
-# In[56]:
+# In[113]:
 
 
 #remove URL
@@ -202,7 +202,7 @@ st.write('App Passed Phase 2')
 
 # ## Change any datetime columns to integer values
 
-# In[58]:
+# In[115]:
 
 
 #columns that need to be changed
@@ -227,7 +227,7 @@ small_df['calendar_last_scraped'] = small_df['calendar_last_scraped'].dt.strftim
 
 # ## Change categorical values into dummy variables
 
-# In[60]:
+# In[117]:
 
 
 df = small_df.copy()
@@ -255,7 +255,7 @@ print(df['amenities'])
 
 # ## Use Total Number of Amenities Instead of Individual
 
-# In[62]:
+# In[119]:
 
 
 #the ast.literal_eval turns the string that holds a list into just a list of the different amenities
@@ -267,7 +267,7 @@ df['amenities'] = df['amenities'].apply(ast.literal_eval).apply(lambda x: ','.jo
 #df_dummies
 
 
-# In[64]:
+# In[121]:
 
 
 def count_amenities(amenities_str):
@@ -298,7 +298,7 @@ st.write("App Passed Phase 3")
 
 # ## Get dummy values and apply prefix to help with organizatioon
 
-# In[66]:
+# In[123]:
 
 
 #create a list of dummy columns
@@ -314,7 +314,7 @@ dummy_values = pd.get_dummies(df[dummy_cols],prefix=prefix, dtype='uint8', spars
 df = pd.concat([df, dummy_values], axis=1).drop(columns=dummy_cols)
 
 
-# In[44]:
+# In[125]:
 
 
 timeline_cols = df.columns[df.columns.str.contains('calendar')]
@@ -329,7 +329,7 @@ timeline_cols = df.columns[df.columns.str.contains('calendar')]
 
 # ## identify missing data and how to deal with it the means, medians, max, and min to understand how similar the information is
 
-# In[68]:
+# In[127]:
 
 
 #remove all instances of missing price
@@ -389,7 +389,7 @@ for quarter in timeline_cols:
 
 # ## Based on the above analysis it makes sense to impute the data using the median values for each calendar time period year
 
-# In[70]:
+# In[129]:
 
 
 #create the columns that will hold the missing values and mark them before imputing the median
@@ -424,7 +424,7 @@ st.write("App Passed Phase 4")
 
 # ## turn all the sparse values into integer or float values
 
-# In[72]:
+# In[131]:
 
 
 #check the dtypes and confirm there are no strings
@@ -441,7 +441,7 @@ for col in column_list:
 
 # ## remove major outliers
 
-# In[74]:
+# In[133]:
 
 
 #create the upper and lower bounds
@@ -455,7 +455,7 @@ df = df[mask].copy()
 
 # ## scale non-binary features
 
-# In[76]:
+# In[135]:
 
 
 #remove price
@@ -504,7 +504,7 @@ st.write("App Passed Phase 5")
 
 # ## create a function that will run through the different models and once all values are statistically significant return the model information
 
-# In[78]:
+# In[137]:
 
 
 #set the random seed
@@ -533,26 +533,46 @@ x_test_int = sm.add_constant(x_test, has_constant='add')
 
 # ## Test for Multi Colinearity
 
-# In[91]:
+# In[151]:
 
 
-def vif_calc(x_train_int, exclude_const = True):
-    
-    #remove the constant
-    if exclude_const == True and 'const' in x_train_int.columns:
-        df_vif = x_train_int.drop('const', axis = 1)
-    
-    #build a dictionary to hold all data
-    vif_data = {}
-    
-    #check vif for all columns
-    for i, column in enumerate(df_vif.columns):
-        vif = variance_inflation_factor(df_vif.values, i)
-        vif_data[column] = vif
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+import numpy as np
+import pandas as pd
 
-    return vif_data
+def vif_calc(X: pd.DataFrame, drop_const: bool = True) -> dict:
+    # Start from a safe copy
+    Xv = X.copy()
 
-vif_data = vif_calc(x_train_int)
+    # Drop intercept if present
+    if drop_const and 'const' in Xv.columns:
+        Xv = Xv.drop(columns='const')
+
+    # Keep numeric columns only
+    Xv = Xv.select_dtypes(include=[np.number])
+
+    # Replace infs, drop columns that contain NaNs after that
+    Xv = Xv.replace([np.inf, -np.inf], np.nan).dropna(axis=1)
+
+    # Drop zero-variance columns (VIF undefined)
+    Xv = Xv.loc[:, Xv.nunique() > 1]
+
+    if Xv.shape[1] == 0:
+        return {}
+
+    # Compute VIFs
+    return {col: variance_inflation_factor(Xv.values, i)
+            for i, col in enumerate(Xv.columns)}
+
+# ✅ Make sure these are on separate lines
+vif_data = vif_calc(x_train_int, drop_const=True)
+columns_to_drop = []
+
+# Now safely use vif_data
+for col, val in vif_data.items():
+    if not np.isfinite(val):
+        columns_to_drop.append(col)
+st.write("Phase Pass 5.5")
 
 
 # In[ ]:
@@ -561,15 +581,15 @@ vif_data = vif_calc(x_train_int)
 ## Identify issues and rerun VIF again
 
 
-# In[98]:
+# In[140]:
 
 
-columns_to_drop = []
+#columns_to_drop = []
 
 #remove nan values this needs to be done once
-for col, val in vif_data.items():
-    if np.isnan(val):
-        columns_to_drop.append(col)
+#for col, val in vif_data.items():
+#    if np.isnan(val):
+#        columns_to_drop.append(col)
 
 #choosing two columns to remove for the base using median price to help with improved pricing outcomes also needs to be done once
 neighbor_cols = [c for c in vif_data.keys() if c.startswith('neighbourhood_')]
@@ -618,7 +638,7 @@ print(columns_to_drop)
 
 # ## After Making initial edits to alter the nan and inf numbers run until there is no more multicolinearity
 
-# In[101]:
+# In[143]:
 
 
 x_vif_train = x_train_int.drop(columns=columns_to_drop).copy()
@@ -654,7 +674,7 @@ while True:
 
 # ## Build the Model
 
-# In[103]:
+# In[145]:
 
 
 def stepwise_selection(x_train, y_train, threshold = 0.05):
@@ -681,7 +701,7 @@ st.write("App Passed Phase 7")
 
 # ## Test the Model
 
-# In[105]:
+# In[147]:
 
 
 #predict based on the model
