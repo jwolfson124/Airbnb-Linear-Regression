@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[351]:
+# In[485]:
 
 
 ##import the entire dataset in a way where we can just add the next file in with no issues
@@ -28,11 +28,12 @@ import random
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from pathlib import Path
 st.set_page_config(layout='wide') #make sure we can use the entire streamlit page
-st.write("Test")
+st.write("Test 2")
+
 
 # ## Bring in the data from insideairbnb.com and use the listings.csv.gz
 
-# In[291]:
+# In[487]:
 
 
 # Path to the "Air BnB Data" folder inside the repo
@@ -80,7 +81,7 @@ print(report_df)
 st.write("Data for App Loaded")
 
 
-# In[397]:
+# In[452]:
 
 
 # # Step 1: Set the folder path
@@ -136,7 +137,7 @@ st.write("Data for App Loaded")
 
 # ## Identify columns that are not consistent and remove them from df
 
-# In[400]:
+# In[489]:
 
 
 #columns to drop
@@ -159,7 +160,7 @@ df = df.drop(columns=column_drop)#, inplace=True)
 #print(len(combined_df.columns))
 
 
-# In[679]:
+# In[ ]:
 
 
 
@@ -167,7 +168,7 @@ df = df.drop(columns=column_drop)#, inplace=True)
 
 # # Identify Columns that will not be useful to the algorythm
 
-# In[402]:
+# In[491]:
 
 
 #remove URL
@@ -202,7 +203,7 @@ st.write('Dataset Created')
 
 # ## Change any datetime columns to integer values
 
-# In[404]:
+# In[493]:
 
 
 #columns that need to be changed
@@ -219,7 +220,7 @@ small_df['calendar_last_scraped'] = small_df['calendar_last_scraped'].dt.strftim
 
 
 
-# In[96]:
+# In[ ]:
 
 
 
@@ -227,7 +228,7 @@ small_df['calendar_last_scraped'] = small_df['calendar_last_scraped'].dt.strftim
 
 # ## Change categorical values into dummy variables
 
-# In[406]:
+# In[495]:
 
 
 df = small_df.copy()
@@ -255,7 +256,7 @@ print(df['amenities'])
 
 # ## Use Total Number of Amenities Instead of Individual
 
-# In[408]:
+# In[497]:
 
 
 #the ast.literal_eval turns the string that holds a list into just a list of the different amenities
@@ -267,7 +268,7 @@ df['amenities'] = df['amenities'].apply(ast.literal_eval).apply(lambda x: ','.jo
 #df_dummies
 
 
-# In[410]:
+# In[499]:
 
 
 def count_amenities(amenities_str):
@@ -298,7 +299,7 @@ st.write("Amenities Transformation Complete")
 
 # ## Get dummy values and apply prefix to help with organizatioon
 
-# In[412]:
+# In[501]:
 
 
 #create a list of dummy columns
@@ -314,7 +315,7 @@ dummy_values = pd.get_dummies(df[dummy_cols],prefix=prefix, dtype='uint8', spars
 df = pd.concat([df, dummy_values], axis=1).drop(columns=dummy_cols)
 
 
-# In[414]:
+# In[503]:
 
 
 timeline_cols = df.columns[df.columns.str.contains('calendar')]
@@ -329,7 +330,7 @@ timeline_cols = df.columns[df.columns.str.contains('calendar')]
 
 # ## identify missing data and how to deal with it the means, medians, max, and min to understand how similar the information is
 
-# In[416]:
+# In[505]:
 
 
 #remove all instances of missing price
@@ -389,7 +390,7 @@ for quarter in timeline_cols:
 
 # ## Based on the above analysis it makes sense to impute the data using the median values for each calendar time period year
 
-# In[418]:
+# In[507]:
 
 
 #create the columns that will hold the missing values and mark them before imputing the median
@@ -424,7 +425,7 @@ st.write("Missing Data Imputed")
 
 # ## turn all the sparse values into integer or float values
 
-# In[420]:
+# In[509]:
 
 
 #check the dtypes and confirm there are no strings
@@ -441,7 +442,7 @@ for col in column_list:
 
 # ## remove major outliers
 
-# In[422]:
+# In[511]:
 
 
 #create the upper and lower bounds
@@ -455,7 +456,7 @@ df = df[mask].copy()
 
 # ## scale non-binary features
 
-# In[424]:
+# In[513]:
 
 
 #remove price
@@ -494,7 +495,7 @@ st.write("Data Scaled")
 
 # ## create a function that will run through the different models and once all values are statistically significant return the model information
 
-# In[426]:
+# In[515]:
 
 
 #set the random seed
@@ -522,7 +523,7 @@ x_test_int = sm.add_constant(x_test, has_constant='add')
 st.write("Train Test Split Created")
 
 
-# ## Test for Multi Colinearity
+# ## Test for Multi Colinearity - Takes to Long to Run on Streamlit so output of code manually entered
 
 # In[428]:
 
@@ -559,61 +560,61 @@ st.write("Train Test Split Created")
 ## Identify issues and rerun VIF again
 
 
-# In[430]:
+# In[483]:
 
 
-columns_to_drop = []
+# columns_to_drop = []
 
-#remove nan values this needs to be done once
-for col, val in vif_data.items():
-    if np.isnan(val):
-        columns_to_drop.append(col)
+# #remove nan values this needs to be done once
+# for col, val in vif_data.items():
+#     if np.isnan(val):
+#         columns_to_drop.append(col)
 
-#choosing two columns to remove for the base using median price to help with improved pricing outcomes also needs to be done once
-neighbor_cols = [c for c in vif_data.keys() if c.startswith('neighbourhood_')]
-room_cols = [c for c in vif_data.keys() if c.startswith('room_')]
-calendar_cols = [c for c in vif_data.keys() if c.startswith('calendar_')]
+# #choosing two columns to remove for the base using median price to help with improved pricing outcomes also needs to be done once
+# neighbor_cols = [c for c in vif_data.keys() if c.startswith('neighbourhood_')]
+# room_cols = [c for c in vif_data.keys() if c.startswith('room_')]
+# calendar_cols = [c for c in vif_data.keys() if c.startswith('calendar_')]
 
 
-#create a dictionary of medians and their corresponding mean price
-def get_means_for_dummys(df, col_list, dep_var):
-    mean_dict = {}
-    for col in col_list:
+# #create a dictionary of medians and their corresponding mean price
+# def get_means_for_dummys(df, col_list, dep_var):
+#     mean_dict = {}
+#     for col in col_list:
         
-        #make sure the dummy variable = 1
-        mask = df[col] == 1
+#         #make sure the dummy variable = 1
+#         mask = df[col] == 1
     
-        #get a new df
-        hold_df = df.loc[mask, dep_var]
+#         #get a new df
+#         hold_df = df.loc[mask, dep_var]
 
-        #identfiy the median
-        mean_dict[col] = hold_df.mean()
+#         #identfiy the median
+#         mean_dict[col] = hold_df.mean()
     
-    return mean_dict
+#     return mean_dict
 
 
-#find the median column value to remove
-def median_col(mean_dict):
-    sorted_vals = sorted(mean_dict.items(), key= lambda kv:kv[1])
-    index_to_remove = len(sorted_vals) // 2
+# #find the median column value to remove
+# def median_col(mean_dict):
+#     sorted_vals = sorted(mean_dict.items(), key= lambda kv:kv[1])
+#     index_to_remove = len(sorted_vals) // 2
 
-    return sorted_vals[index_to_remove][0]
+#     return sorted_vals[index_to_remove][0]
 
 
-#remove these columns
-#this couldve been done with a loop but I chose to manually type these out
-neighbor_remove = median_col(get_means_for_dummys(df, neighbor_cols, 'price'))
-room_remove = median_col(get_means_for_dummys(df, room_cols, 'price'))
-calendar_remove = median_col(get_means_for_dummys(df, calendar_cols, 'price'))
+# #remove these columns
+# #this couldve been done with a loop but I chose to manually type these out
+# neighbor_remove = median_col(get_means_for_dummys(df, neighbor_cols, 'price'))
+# room_remove = median_col(get_means_for_dummys(df, room_cols, 'price'))
+# calendar_remove = median_col(get_means_for_dummys(df, calendar_cols, 'price'))
 
-columns_to_drop.append(neighbor_remove)
-columns_to_drop.append(room_remove)
-columns_to_drop.append(calendar_remove)
+# columns_to_drop.append(neighbor_remove)
+# columns_to_drop.append(room_remove)
+# columns_to_drop.append(calendar_remove)
 
-st.write("VIF Drop Columns Created")
-print(columns_to_drop)
+# st.write("VIF Drop Columns Created")
+# print(columns_to_drop)
 
-x_vif_train = x_train_int.drop(columns=columns_to_drop, errors="ignore").copy()
+# x_vif_train = x_train_int.drop(columns=columns_to_drop, errors="ignore").copy()
 
 
 # ## After Making initial edits to alter the nan and inf numbers run until there is no more multicolinearity
@@ -684,7 +685,7 @@ x_vif_train = x_train_int.drop(columns=columns_to_drop, errors="ignore").copy()
 #     i += 1
 
 
-# In[436]:
+# In[517]:
 
 
 #x_vif_train.columns
@@ -714,7 +715,7 @@ x_vif_train = ['const', 'host_is_superhost', 'bathrooms', 'bedrooms', 'beds',
        'reviews_per_month_missing']
 
 
-# In[438]:
+# In[519]:
 
 
 x_train_int = x_train_int[x_vif_train]
@@ -729,7 +730,7 @@ x_test_int = x_test_int[x_vif_train]
 
 # ## Build the Model
 
-# In[440]:
+# In[521]:
 
 
 def stepwise_selection(x_train, y_train, threshold = 0.05):
