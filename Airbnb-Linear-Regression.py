@@ -817,7 +817,7 @@ st.write("This dashboard will analyze 1 year of Boston airbnb data to understand
 
 # ### Variable Effects
 
-# In[923]:
+# In[931]:
 
 
 #columns to view
@@ -833,21 +833,29 @@ y = 'price'
 #create a df to look at the average price
 mean_df = pre_scaled_df[['price', select_column]].groupby(select_column).mean().reset_index()
 
-
-scatter = alt.Chart(mean_df).mark_bar(size=64, opacity=0.6).encode(
+#create the bar chart
+bar = alt.Chart(mean_df).mark_bar(size=64, opacity=0.6).encode(
     x=alt.X(f"{select_column}:Q", title=select_column),
     y=alt.Y("price:Q", title="Price"),
     tooltip=[alt.Tooltip(f"{select_column}:Q"), alt.Tooltip("price:Q", format=",.0f")],
-    color=alt.Color(f"{select_column}:Q", legend=None)
-).properties(width=650, height=400)
+    color=alt.Color(f"{select_column}:Q", legend=None))
 
-trend = alt.Chart(mean_df).transform_regression(select_column, "price").mark_line()
+
+#create the trend line
+trend = alt.Chart(mean_df).mark_line(color='red', strokeWidth = 3).transform_regression(
+    select_column, "price").encode(
+    x=alt.X(f"{select_column}:Q", title=select_column),
+    y=alt.Y("price:Q", title="Price")
+    )
+
+#combined the two
+combined_chart = (bar + trend).resolve_scale(color='independent').properties(width=650, height=400)
 
 col1, col2 = st.columns(2)
 
 with col1:
     st.subheader(f"{select_column} vs Average Price")
-    st.altair_chart(scatter + trend)
+    st.altair_chart(bar + trend)
 
 
 # In[917]:
