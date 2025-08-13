@@ -865,7 +865,7 @@ for col in columns:
     else:
         cont_col.append(col)
 
-len(binary_col) + len(cont_col)
+#len(binary_col) + len(cont_col)
 
 
 # In[1122]:
