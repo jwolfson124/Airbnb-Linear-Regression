@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[485]:
+# In[722]:
 
 
 ##import the entire dataset in a way where we can just add the next file in with no issues
@@ -28,12 +28,11 @@ import random
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from pathlib import Path
 st.set_page_config(layout='wide') #make sure we can use the entire streamlit page
-st.write("Test 2")
 
 
 # ## Bring in the data from insideairbnb.com and use the listings.csv.gz
 
-# In[487]:
+# In[672]:
 
 
 # Path to the "Air BnB Data" folder inside the repo
@@ -78,10 +77,16 @@ report_df = pd.DataFrame(missing_column_report)
 print(f"Loaded {len(excel_files)} files from {DATA_DIR}")
 print("Combined shape:", combined_df.shape)
 print(report_df)
-st.write("Data for App Loaded")
+#st.write("Data for App Loaded")
 
 
-# In[452]:
+# In[ ]:
+
+
+
+
+
+# In[726]:
 
 
 # # Step 1: Set the folder path
@@ -137,7 +142,7 @@ st.write("Data for App Loaded")
 
 # ## Identify columns that are not consistent and remove them from df
 
-# In[489]:
+# In[728]:
 
 
 #columns to drop
@@ -168,7 +173,7 @@ df = df.drop(columns=column_drop)#, inplace=True)
 
 # # Identify Columns that will not be useful to the algorythm
 
-# In[491]:
+# In[730]:
 
 
 #remove URL
@@ -184,6 +189,8 @@ keep_columns = ['host_since', 'host_response_rate', 'host_acceptance_rate',
                ]
 
 small_df = df[keep_columns].copy()
+
+original_df = df.copy()
 
 #change columns: 
 #host_is_superhost - binary, 
@@ -203,7 +210,7 @@ st.write('Dataset Created')
 
 # ## Change any datetime columns to integer values
 
-# In[493]:
+# In[732]:
 
 
 #columns that need to be changed
@@ -211,7 +218,7 @@ print(small_df.select_dtypes(include=['datetime', 'datetime64[ns]', 'datetimetz'
 
 #change host since to get total days as a host, also remove the NAN values, and drop the old column
 small_df = small_df[~small_df['host_since'].isna()]
-small_df['host since'] = (datetime.now() - small_df['host_since']).dt.days.astype(int)
+small_df['host_since_years'] = (datetime.now() - small_df['host_since']).dt.days.astype(int) / 365
 small_df = small_df.drop(columns='host_since')
 
 
@@ -220,7 +227,7 @@ small_df['calendar_last_scraped'] = small_df['calendar_last_scraped'].dt.strftim
 
 
 
-# In[ ]:
+# In[550]:
 
 
 
@@ -228,7 +235,7 @@ small_df['calendar_last_scraped'] = small_df['calendar_last_scraped'].dt.strftim
 
 # ## Change categorical values into dummy variables
 
-# In[495]:
+# In[734]:
 
 
 df = small_df.copy()
@@ -256,7 +263,7 @@ print(df['amenities'])
 
 # ## Use Total Number of Amenities Instead of Individual
 
-# In[497]:
+# In[736]:
 
 
 #the ast.literal_eval turns the string that holds a list into just a list of the different amenities
@@ -268,7 +275,7 @@ df['amenities'] = df['amenities'].apply(ast.literal_eval).apply(lambda x: ','.jo
 #df_dummies
 
 
-# In[499]:
+# In[738]:
 
 
 def count_amenities(amenities_str):
@@ -299,7 +306,7 @@ st.write("Amenities Transformation Complete")
 
 # ## Get dummy values and apply prefix to help with organizatioon
 
-# In[501]:
+# In[740]:
 
 
 #create a list of dummy columns
@@ -315,7 +322,7 @@ dummy_values = pd.get_dummies(df[dummy_cols],prefix=prefix, dtype='uint8', spars
 df = pd.concat([df, dummy_values], axis=1).drop(columns=dummy_cols)
 
 
-# In[503]:
+# In[742]:
 
 
 timeline_cols = df.columns[df.columns.str.contains('calendar')]
@@ -330,7 +337,7 @@ timeline_cols = df.columns[df.columns.str.contains('calendar')]
 
 # ## identify missing data and how to deal with it the means, medians, max, and min to understand how similar the information is
 
-# In[505]:
+# In[744]:
 
 
 #remove all instances of missing price
@@ -390,7 +397,7 @@ for quarter in timeline_cols:
 
 # ## Based on the above analysis it makes sense to impute the data using the median values for each calendar time period year
 
-# In[507]:
+# In[746]:
 
 
 #create the columns that will hold the missing values and mark them before imputing the median
@@ -425,7 +432,7 @@ st.write("Missing Data Imputed")
 
 # ## turn all the sparse values into integer or float values
 
-# In[509]:
+# In[748]:
 
 
 #check the dtypes and confirm there are no strings
@@ -442,7 +449,7 @@ for col in column_list:
 
 # ## remove major outliers
 
-# In[511]:
+# In[750]:
 
 
 #create the upper and lower bounds
@@ -456,10 +463,12 @@ df = df[mask].copy()
 
 # ## scale non-binary features
 
-# In[513]:
+# In[814]:
 
 
 #remove price
+pre_scaled_df = df.copy()
+
 columns_to_check = [col for col in df if col != 'price']
 
 #find the min and max for all columns
@@ -495,7 +504,7 @@ st.write("Data Scaled")
 
 # ## create a function that will run through the different models and once all values are statistically significant return the model information
 
-# In[515]:
+# In[754]:
 
 
 #set the random seed
@@ -685,7 +694,7 @@ st.write("Train Test Split Created")
 #     i += 1
 
 
-# In[517]:
+# In[756]:
 
 
 #x_vif_train.columns
@@ -696,7 +705,7 @@ x_vif_train = ['const', 'host_is_superhost', 'bathrooms', 'bedrooms', 'beds',
        'review_scores_cleanliness', 'review_scores_checkin',
        'review_scores_communication', 'review_scores_value',
        'instant_bookable', 'calculated_host_listings_count',
-       'reviews_per_month', 'host since', 'neighbourhood_Allston',
+       'reviews_per_month', 'host_since_years', 'neighbourhood_Allston',
        'neighbourhood_Back Bay', 'neighbourhood_Bay Village',
        'neighbourhood_Beacon Hill', 'neighbourhood_Brighton',
        'neighbourhood_Charlestown', 'neighbourhood_Chinatown',
@@ -715,7 +724,7 @@ x_vif_train = ['const', 'host_is_superhost', 'bathrooms', 'bedrooms', 'beds',
        'reviews_per_month_missing']
 
 
-# In[519]:
+# In[758]:
 
 
 x_train_int = x_train_int[x_vif_train]
@@ -730,7 +739,7 @@ x_test_int = x_test_int[x_vif_train]
 
 # ## Build the Model
 
-# In[521]:
+# In[760]:
 
 
 def stepwise_selection(x_train, y_train, threshold = 0.05):
@@ -757,30 +766,93 @@ st.write("App Passed Phase 7")
 
 # ## Test the Model
 
-# In[442]:
+# In[762]:
 
 
 #predict based on the model
 y_pred_log = model.predict(x_test_int[model_columns])
 y_pred = np.exp(y_pred_log)
 
-r2 = r2_score(y_test, y_pred)
+#r2 test results
+r2_test = r2_score(y_test, y_pred)
 print("R-Squared of the Test Data:", r2)
 
-mse = root_mean_squared_error(y_test, y_pred)
+#mse_test results
+mse_test = root_mean_squared_error(y_test, y_pred)
 print("Mean Squared Error of the Test Data:", mse)
 
 
 st.write("App Passed Phase 8")
 
+st.write(f"R-Squared {r2}")
+st.write(f"MSE {mse}")
 
-# In[ ]:
+#get the train values for r2 and adj_r2
+r2_train = model.rsquared
+adj_r2_train = model.rsquared_adj
+
+
+
+# # Time to build the App
+
+# ### Introduction
+
+# In[764]:
+
+
+st.title(":orange[Boston Airbnb Price Model]")
+st.write("This dashboard will analyze 1 year of Boston airbnb data to understand what variables effect the price of airbnb's in the Boston Area.")
+
+
+# In[800]:
 
 
 
 
 
-# In[ ]:
+# ### Variable Effects
+
+# In[824]:
+
+
+#set up dashboard
+col1 = st.columns(1)
+
+#columns to view
+columns = list(model.params.index)
+columns.remove('const')
+
+select_column = st.selectbox("Select a column to view price relationship:", columns)
+
+#get x and y variables
+x = select_column
+y = 'price'
+
+#scatter = alt.Chart(pre_scaled_df).mark_circle(size=64, opacity=0.6).encode(
+#    x=alt.X(f"{select_column}:Q", title=select_column),
+#    y=alt.Y("price:Q", title="Price"),
+#    tooltip=[alt.Tooltip(f"{select_column}:Q"), alt.Tooltip("price:Q", format=",.0f")],
+#    color=alt.Color(f"{select_column}:Q", legend=None)
+#).properties(width=650, height=400)
+
+
+#with col1:
+#    st.subheader(f"{select_column} vs Price")
+#    st.altair_chart(scatter)
+
+
+# ## Variables and there effects
+
+# In[646]:
+
+
+#overall effects
+effect_df = model.params.to_frame("coef").reset_index().rename(columns = {"index": 'Var Name'})
+
+effect_df = effect_df.sort_values(by="coef")
+
+
+# In[661]:
 
 
 
