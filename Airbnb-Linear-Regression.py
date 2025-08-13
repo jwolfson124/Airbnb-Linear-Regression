@@ -817,7 +817,7 @@ st.write("This dashboard will analyze 1 year of Boston airbnb data to understand
 
 # ### Variable Effects
 
-# In[947]:
+# In[949]:
 
 
 #columns to view
@@ -845,7 +845,7 @@ bar = alt.Chart(mean_df).mark_bar(size=64, opacity=0.6).encode(
 #create the trend line
 trend = alt.Chart(mean_df).mark_line(color='red', strokeWidth = 3).transform_regression(
     select_column, "price").encode(
-    x=alt.X(f"{select_column}:Q", title=select_column),
+    x=alt.X(f"{select_column}:Q"),
     y=alt.Y("price:Q", title="Price")
     )
 
