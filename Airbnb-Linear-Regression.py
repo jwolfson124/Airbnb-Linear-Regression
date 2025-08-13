@@ -936,25 +936,25 @@ with col1:
 
 # ### Create a Chart to analyze binary columns
 
-# In[1104]:
+# In[1106]:
 
 
 #create the select column from the binary columns
-select_column = st.selectbox("Select a binary column to view relationship to Airbnb Price", binary_col)
+select_column2 = st.selectbox("Select a binary column to view relationship to Airbnb Price", binary_col)
 
 #create the violin price chart
 violin_price = alt.Chart(pre_scaled_df).transform_density(
     'price',
     as_=['price', 'density'],
-    groupby=[select_column]
+    groupby=[select_column2]
 ).mark_area(
     orient='horizontal',
     opacity=0.7
 ).encode(
     x=alt.X('density:Q', stack='center', axis=alt.Axis(labels=False)),
     y=alt.Y('price:Q', title='Price'),
-    color=alt.Color(f'{select_column}:N', title=select_column.title()),
-    column=alt.Column(f'{select_column}:N', title=select_column.title())
+    color=alt.Color(f'{select_column}:N', title=select_column2.title()),
+    column=alt.Column(f'{select_column}:N', title=select_column2.title())
 ).properties(
     width=150, 
     height=400
@@ -962,7 +962,7 @@ violin_price = alt.Chart(pre_scaled_df).transform_density(
 
 
 with col2:
-    st.subheader(f'{select_column} vs Average Price')
+    st.subheader(f'{select_column2} vs Average Price')
     st.altair_chart(violin_price)
 
 
