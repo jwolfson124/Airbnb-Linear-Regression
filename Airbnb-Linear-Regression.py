@@ -966,7 +966,7 @@ bw_plot = alt.Chart(pre_scaled_df).mark_boxplot(size=200, #width of boxplot
                                                ).encode(
     x=alt.X(f'{select_column2}:N', title=select_column2),
     y=alt.Y('price:Q', title='Price'),
-color=alt.Color(f'{select_column2}:N', legend=None).properties(width=650, height=400)
+color=alt.Color(f'{select_column2}:N', legend=None).properties(width=650, height=100)
 )
 
 
