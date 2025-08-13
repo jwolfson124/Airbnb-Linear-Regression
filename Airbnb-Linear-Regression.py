@@ -817,7 +817,7 @@ st.write("This dashboard will analyze 1 year of Boston airbnb data to understand
 
 # ### Variable Effects
 
-# In[921]:
+# In[923]:
 
 
 #columns to view
@@ -841,11 +841,13 @@ scatter = alt.Chart(mean_df).mark_bar(size=64, opacity=0.6).encode(
     color=alt.Color(f"{select_column}:Q", legend=None)
 ).properties(width=650, height=400)
 
-col1 = st.columns(1)[0]
+trend = alt.Chart(mean_df).transform_regression(select_column, "price").mark_line()
+
+col1, col2 = st.columns(2)
 
 with col1:
-    st.subheader(f"{select_column} vs Price")
-    st.altair_chart(scatter)
+    st.subheader(f"{select_column} vs Average Price")
+    st.altair_chart(scatter + trend)
 
 
 # In[917]:
