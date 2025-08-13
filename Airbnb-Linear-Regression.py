@@ -977,7 +977,7 @@ violin_price = alt.Chart(pre_scaled_df).transform_density(
 
 with col2:
     st.subheader(f'{select_column2} vs Average Price')
-    st.altair_chart(violin_price, use_container_width=True)
+    st.altair_chart(violin_price)
 
 
 # ### Create the first set of two graphs to explore the data
