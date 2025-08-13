@@ -884,7 +884,7 @@ with col2:
 
 # ### Variable Effects: Continous
 
-# In[1118]:
+# In[1158]:
 
 
 #select_column = st.selectbox("Select a continuous column to view relationship to Airbnb Price", cont_col)
@@ -935,7 +935,7 @@ bar = alt.Chart(mean_df).mark_bar(size=64, opacity=1).encode(
 trend = alt.Chart(mean_df).mark_line(color='red', strokeWidth = 3).transform_regression(
     select_column, "price").encode(
     x=alt.X(f"{select_column}:Q"),
-    y=alt.Y("price:Q", title="Price")
+    y=alt.Y("price:Q")
     )
 
 #combined the two
@@ -950,34 +950,23 @@ with col1:
 
 # ### Create a Chart to analyze binary columns
 
-# In[1120]:
+# In[1160]:
 
 
 #create the select column from the binary columns
 #select_column2 = st.selectbox("Select a binary column to view relationship to Airbnb Price", binary_col)
 
 #create the violin price chart
-violin_price = alt.Chart(pre_scaled_df).transform_density(
-    'price',
-    as_=['price', 'density'],
-    groupby=[select_column2]
-).mark_area(
-    orient='horizontal',
-    opacity=0.7
-).encode(
-    x=alt.X('density:Q', stack='center', axis=alt.Axis(labels=False)),
+bw_plot = alt.Chart(pre_scaled_df).mark_boxplot(size=64).encode(
+    x=alt.X(f'{select_column2}:N', title=select_column2),
     y=alt.Y('price:Q', title='Price'),
-    color=alt.Color(f'{select_column2}:N', title=select_column2.title()),
-    column=alt.Column(f'{select_column2}:N', title=select_column2.title())
-).properties(
-    width=150, 
-    height=400
+color=alt.Color(f'{select_column2}:N', legend=None)
 )
 
 
 with col2:
     st.subheader(f'{select_column2} vs Average Price')
-    st.altair_chart(violin_price)
+    st.altair_chart(bw_plot)
 
 
 # ### Create the first set of two graphs to explore the data
