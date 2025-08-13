@@ -817,7 +817,7 @@ st.write("This dashboard will analyze 1 year of Boston airbnb data to understand
 
 # ### Variable Effects
 
-# In[953]:
+# In[1016]:
 
 
 #columns to view
@@ -831,7 +831,31 @@ x = select_column
 y = 'price'
 
 #create a df to look at the average price
-mean_df = pre_scaled_df[['price', select_column]].groupby(select_column).mean().reset_index()
+#pre_scaled_df[['price', select_column]].groupby(select_column).mean().reset_index()
+
+#BIG EDITS TO VARIOUS COLUMNS DEPENDING ON HOW MANY UNIQUE COLUMN VALUES THERE ARE
+#get the count of unique values
+unique_count = pre_scaled_df[select_column].nunique()
+
+#if the count of unique values is low enough than group them as normal without binning
+if unique_count <= 10:
+    mean_df = pre_scaled_df[['price', select_column]].groupby(select_column).mean().reset_index()
+
+#otherwise binning is necessary
+else:
+    use_df = pre_scaled_df.copy()
+    use_df[f'{select_column}_binned'] = pd.cut(use_df[select_column],
+                                              bins=10,
+                                              precision=1)
+
+    #get the means by the bin
+    mean_df = use_df.groupby(f'{select_column}_binned')['price'].mean().reset_index()
+
+    #create new column bin_label that is a string
+    mean_df['bin_label'] = mean_df[f'{select_column}_binned'].astype(str)
+    mean_df[select_column] = mean_df[f'{select_column}_binned'].apply(lambda x: x.mid)
+
+
 
 #create the bar chart
 bar = alt.Chart(mean_df).mark_bar(size=64, opacity=0.6).encode(
@@ -860,10 +884,31 @@ with col1:
     st.altair_chart(combined_chart, use_container_width=True)
 
 
-# In[917]:
+# In[1014]:
 
 
+pre_scaled_df[['price', select_column]].groupby(select_column).mean().reset_index()
 
+#get the count of unique values
+unique_count = pre_scaled_df[select_column].nunique()
+
+#if the count of unique values is low enough than group them as normal without binning
+if unique_count <= 10:
+    mean_df = pre_scaled_df[['price', select_column]].groupby(select_column).mean().reset_index()
+
+#otherwise binning is necessary
+else:
+    use_df = pre_scaled_df.copy()
+    use_df[f'{select_column}_binned'] = pd.cut(use_df[select_column],
+                                              bins=10,
+                                              precision=1)
+
+    #get the means by the bin
+    mean_df = use_df.groupby(f'{select_column}_binned')['price'].mean().reset_index()
+
+    #create new column bin_label that is a string
+    mean_df['bin_label'] = mean_df[f'{select_column}_binned'].astype(str)
+    mean_df[select_column] = mean_df[f'{select_column}_binned'].apply(lambda x: x.mid)
 
 
 # ## Variables and there effects
