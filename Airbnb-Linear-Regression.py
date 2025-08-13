@@ -28,7 +28,6 @@ import random
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from pathlib import Path
 st.set_page_config(layout='wide') #make sure we can use the entire streamlit page
-st.write("blah")
 
 
 # ## Bring in the data from insideairbnb.com and use the listings.csv.gz
@@ -785,8 +784,8 @@ mse_test = root_mean_squared_error(y_test, y_pred)
 
 st.write("App Passed Phase 8")
 
-st.write(f"R-Squared {r2}")
-st.write(f"MSE {mse}")
+st.write(f"R-Squared Test: {r2_test}")
+st.write(f"MSE Test: {mse_test}")
 
 #get the train values for r2 and adj_r2
 r2_train = model.rsquared
