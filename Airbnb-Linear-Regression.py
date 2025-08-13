@@ -817,7 +817,7 @@ st.write("This dashboard will analyze 1 year of Boston airbnb data to understand
 
 # ### Variable Effects
 
-# In[943]:
+# In[947]:
 
 
 #columns to view
@@ -839,7 +839,7 @@ bar = alt.Chart(mean_df).mark_bar(size=64, opacity=0.6).encode(
            sort = alt.SortField(field=select_column, order='ascending')),
     y=alt.Y("price:Q", title="Price"),
     tooltip=[alt.Tooltip(f"{select_column}:Q"), alt.Tooltip("price:Q", format=",.0f")],
-    color=alt.Color(f"{select_column}:Q", legend=None))
+    color=alt.Color(f"{select_column}:Q", bin=alt.Bin(maxbins=10), legend=None))
 
 
 #create the trend line
