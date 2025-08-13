@@ -817,7 +817,7 @@ st.write("This dashboard will analyze 1 year of Boston airbnb data to understand
 
 # ### Variable Effects
 
-# In[898]:
+# In[921]:
 
 
 #columns to view
@@ -830,9 +830,11 @@ select_column = st.selectbox("Select a column to view price relationship:", colu
 x = select_column
 y = 'price'
 
+#create a df to look at the average price
+mean_df = pre_scaled_df[['price', select_column]].groupby(select_column).mean().reset_index()
 
 
-scatter = alt.Chart(pre_scaled_df).mark_circle(size=64, opacity=0.6).encode(
+scatter = alt.Chart(mean_df).mark_bar(size=64, opacity=0.6).encode(
     x=alt.X(f"{select_column}:Q", title=select_column),
     y=alt.Y("price:Q", title="Price"),
     tooltip=[alt.Tooltip(f"{select_column}:Q"), alt.Tooltip("price:Q", format=",.0f")],
@@ -844,6 +846,12 @@ col1 = st.columns(1)[0]
 with col1:
     st.subheader(f"{select_column} vs Price")
     st.altair_chart(scatter)
+
+
+# In[917]:
+
+
+
 
 
 # ## Variables and there effects
