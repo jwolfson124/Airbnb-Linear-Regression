@@ -205,7 +205,7 @@ original_df = df.copy()
 #enter in latitude and longitude for more specific location pricing
 #currently just using neighbourhood_cleansed
 
-st.write('Dataset Created')
+#st.write('Dataset Created')
 
 
 # ## Change any datetime columns to integer values
@@ -293,7 +293,7 @@ def count_amenities(amenities_str):
 #change the amenities list into a count of all amenities
 df['amenities'] = df['amenities'].apply(count_amenities)
 
-st.write("Amenities Transformation Complete")
+#st.write("Amenities Transformation Complete")
 
 
 # ## edit the data so that it will show entire vs shared vs private room as opposed to all the different options
@@ -427,7 +427,7 @@ for quarter in timeline_cols:
             df.loc[miss_mask, f'{col}_missing'] = 1
             df.loc[miss_mask, col] = medians
 
-st.write("Missing Data Imputed")
+#st.write("Missing Data Imputed")
 
 
 # ## turn all the sparse values into integer or float values
@@ -498,7 +498,7 @@ for col in columns_to_check:
 scaler = StandardScaler()
 df[columns_to_scale] = scaler.fit_transform(df[columns_to_scale])
 
-st.write("Data Scaled")
+#st.write("Data Scaled")
 
 
 # In[ ]:
@@ -534,7 +534,7 @@ x_train_int = sm.add_constant(x_train, has_constant='add')
 x_test_int = sm.add_constant(x_test, has_constant='add')
 
 #x_train_int.columns.str.contains('const')
-st.write("Train Test Split Created")
+#st.write("Train Test Split Created")
 
 
 # ## Test for Multi Colinearity - Takes to Long to Run on Streamlit so output of code manually entered
@@ -766,7 +766,7 @@ def stepwise_selection(x_train, y_train, threshold = 0.05):
 
 model_columns, model = stepwise_selection(x_train_int, y_train_log, threshold=0.1)
 
-st.write("App Passed Phase 7")
+#st.write("App Passed Phase 7")
 
 
 # ## Test the Model
@@ -787,7 +787,7 @@ mse_test = root_mean_squared_error(y_test, y_pred)
 #print("Mean Squared Error of the Test Data:", mse)
 
 
-st.write("App Passed Phase 8")
+#st.write("App Passed Phase 8")
 
 st.write(f"R-Squared Test: {r2_test}")
 st.write(f"MSE Test: {mse_test}")
@@ -817,7 +817,7 @@ st.write("This dashboard will analyze 1 year of Boston airbnb data to understand
 
 # ### Variable Effects
 
-# In[931]:
+# In[937]:
 
 
 #columns to view
@@ -838,7 +838,7 @@ bar = alt.Chart(mean_df).mark_bar(size=64, opacity=0.6).encode(
     x=alt.X(f"{select_column}:Q", title=select_column),
     y=alt.Y("price:Q", title="Price"),
     tooltip=[alt.Tooltip(f"{select_column}:Q"), alt.Tooltip("price:Q", format=",.0f")],
-    color=alt.Color(f"{select_column}:Q", legend=None))
+    color=alt.Color(f"{select_column}:Q", bin=alt.Bin(maxbins=20), legend=None))
 
 
 #create the trend line
