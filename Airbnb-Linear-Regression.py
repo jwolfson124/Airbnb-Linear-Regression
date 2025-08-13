@@ -817,7 +817,7 @@ st.write("This dashboard will analyze 1 year of Boston airbnb data to understand
 
 # ### Variable Effects
 
-# In[951]:
+# In[953]:
 
 
 #columns to view
@@ -857,7 +857,7 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.subheader(f"{select_column} vs Average Price")
-    st.altair_chart(bar + trend)
+    st.altair_chart(combined_chart, use_container_width=True)
 
 
 # In[917]:
