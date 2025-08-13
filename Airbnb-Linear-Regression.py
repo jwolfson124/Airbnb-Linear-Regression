@@ -868,12 +868,26 @@ for col in columns:
 len(binary_col) + len(cont_col)
 
 
+# In[1108]:
+
+
+##create the drop down options that are going to be referenced
+
+col1, col2 = st.columns(2)
+
+with col1:
+    select_column = st.selectbox("Select a continuous column to view relationship to Airbnb Price", cont_col)
+
+with col2:
+    select_column2 = st.selectbox("Select a binary column to view relationship to Airbnb Price", binary_col)
+
+
 # ### Variable Effects: Continous
 
-# In[1094]:
+# In[1110]:
 
 
-select_column = st.selectbox("Select a continuous column to view relationship to Airbnb Price", cont_col)
+#select_column = st.selectbox("Select a continuous column to view relationship to Airbnb Price", cont_col)
 
 #get x and y variables
 #x = select_column
@@ -936,7 +950,7 @@ with col1:
 
 # ### Create a Chart to analyze binary columns
 
-# In[1106]:
+# In[1112]:
 
 
 #create the select column from the binary columns
@@ -953,8 +967,8 @@ violin_price = alt.Chart(pre_scaled_df).transform_density(
 ).encode(
     x=alt.X('density:Q', stack='center', axis=alt.Axis(labels=False)),
     y=alt.Y('price:Q', title='Price'),
-    color=alt.Color(f'{select_column}:N', title=select_column2.title()),
-    column=alt.Column(f'{select_column}:N', title=select_column2.title())
+    color=alt.Color(f'{select_column2}:N', title=select_column2.title()),
+    column=alt.Column(f'{select_column2}:N', title=select_column2.title())
 ).properties(
     width=150, 
     height=400
