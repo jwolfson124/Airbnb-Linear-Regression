@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[722]:
+# In[832]:
 
 
 ##import the entire dataset in a way where we can just add the next file in with no issues
@@ -86,7 +86,7 @@ print(report_df)
 
 
 
-# In[726]:
+# In[834]:
 
 
 # # Step 1: Set the folder path
@@ -142,7 +142,7 @@ print(report_df)
 
 # ## Identify columns that are not consistent and remove them from df
 
-# In[728]:
+# In[836]:
 
 
 #columns to drop
@@ -173,7 +173,7 @@ df = df.drop(columns=column_drop)#, inplace=True)
 
 # # Identify Columns that will not be useful to the algorythm
 
-# In[730]:
+# In[838]:
 
 
 #remove URL
@@ -210,7 +210,7 @@ st.write('Dataset Created')
 
 # ## Change any datetime columns to integer values
 
-# In[732]:
+# In[840]:
 
 
 #columns that need to be changed
@@ -235,7 +235,7 @@ small_df['calendar_last_scraped'] = small_df['calendar_last_scraped'].dt.strftim
 
 # ## Change categorical values into dummy variables
 
-# In[734]:
+# In[842]:
 
 
 df = small_df.copy()
@@ -263,7 +263,7 @@ print(df['amenities'])
 
 # ## Use Total Number of Amenities Instead of Individual
 
-# In[736]:
+# In[844]:
 
 
 #the ast.literal_eval turns the string that holds a list into just a list of the different amenities
@@ -275,7 +275,7 @@ df['amenities'] = df['amenities'].apply(ast.literal_eval).apply(lambda x: ','.jo
 #df_dummies
 
 
-# In[738]:
+# In[846]:
 
 
 def count_amenities(amenities_str):
@@ -306,7 +306,7 @@ st.write("Amenities Transformation Complete")
 
 # ## Get dummy values and apply prefix to help with organizatioon
 
-# In[740]:
+# In[848]:
 
 
 #create a list of dummy columns
@@ -322,7 +322,7 @@ dummy_values = pd.get_dummies(df[dummy_cols],prefix=prefix, dtype='uint8', spars
 df = pd.concat([df, dummy_values], axis=1).drop(columns=dummy_cols)
 
 
-# In[742]:
+# In[850]:
 
 
 timeline_cols = df.columns[df.columns.str.contains('calendar')]
@@ -337,7 +337,7 @@ timeline_cols = df.columns[df.columns.str.contains('calendar')]
 
 # ## identify missing data and how to deal with it the means, medians, max, and min to understand how similar the information is
 
-# In[744]:
+# In[852]:
 
 
 #remove all instances of missing price
@@ -397,7 +397,7 @@ for quarter in timeline_cols:
 
 # ## Based on the above analysis it makes sense to impute the data using the median values for each calendar time period year
 
-# In[746]:
+# In[854]:
 
 
 #create the columns that will hold the missing values and mark them before imputing the median
@@ -432,7 +432,7 @@ st.write("Missing Data Imputed")
 
 # ## turn all the sparse values into integer or float values
 
-# In[748]:
+# In[856]:
 
 
 #check the dtypes and confirm there are no strings
@@ -449,7 +449,7 @@ for col in column_list:
 
 # ## remove major outliers
 
-# In[750]:
+# In[858]:
 
 
 #create the upper and lower bounds
@@ -461,13 +461,18 @@ mask = (df['price'] >= lower_bound) & (df['price'] <= upper_bound)
 df = df[mask].copy()
 
 
+# In[862]:
+
+
+pre_scaled_df = df.copy()
+
+
 # ## scale non-binary features
 
-# In[814]:
+# In[864]:
 
 
 #remove price
-pre_scaled_df = df.copy()
 
 columns_to_check = [col for col in df if col != 'price']
 
@@ -504,7 +509,7 @@ st.write("Data Scaled")
 
 # ## create a function that will run through the different models and once all values are statistically significant return the model information
 
-# In[754]:
+# In[866]:
 
 
 #set the random seed
@@ -694,7 +699,7 @@ st.write("Train Test Split Created")
 #     i += 1
 
 
-# In[756]:
+# In[868]:
 
 
 #x_vif_train.columns
@@ -724,7 +729,7 @@ x_vif_train = ['const', 'host_is_superhost', 'bathrooms', 'bedrooms', 'beds',
        'reviews_per_month_missing']
 
 
-# In[758]:
+# In[870]:
 
 
 x_train_int = x_train_int[x_vif_train]
@@ -739,7 +744,7 @@ x_test_int = x_test_int[x_vif_train]
 
 # ## Build the Model
 
-# In[760]:
+# In[872]:
 
 
 def stepwise_selection(x_train, y_train, threshold = 0.05):
@@ -766,7 +771,7 @@ st.write("App Passed Phase 7")
 
 # ## Test the Model
 
-# In[826]:
+# In[874]:
 
 
 #predict based on the model
@@ -797,7 +802,7 @@ adj_r2_train = model.rsquared_adj
 
 # ### Introduction
 
-# In[764]:
+# In[876]:
 
 
 st.title(":orange[Boston Airbnb Price Model]")
@@ -812,11 +817,8 @@ st.write("This dashboard will analyze 1 year of Boston airbnb data to understand
 
 # ### Variable Effects
 
-# In[824]:
+# In[898]:
 
-
-#set up dashboard
-col1 = st.columns(1)
 
 #columns to view
 columns = list(model.params.index)
@@ -828,17 +830,20 @@ select_column = st.selectbox("Select a column to view price relationship:", colu
 x = select_column
 y = 'price'
 
-#scatter = alt.Chart(pre_scaled_df).mark_circle(size=64, opacity=0.6).encode(
-#    x=alt.X(f"{select_column}:Q", title=select_column),
-#    y=alt.Y("price:Q", title="Price"),
-#    tooltip=[alt.Tooltip(f"{select_column}:Q"), alt.Tooltip("price:Q", format=",.0f")],
-#    color=alt.Color(f"{select_column}:Q", legend=None)
-#).properties(width=650, height=400)
 
 
-#with col1:
-#    st.subheader(f"{select_column} vs Price")
-#    st.altair_chart(scatter)
+scatter = alt.Chart(pre_scaled_df).mark_circle(size=64, opacity=0.6).encode(
+    x=alt.X(f"{select_column}:Q", title=select_column),
+    y=alt.Y("price:Q", title="Price"),
+    tooltip=[alt.Tooltip(f"{select_column}:Q"), alt.Tooltip("price:Q", format=",.0f")],
+    color=alt.Color(f"{select_column}:Q", legend=None)
+).properties(width=650, height=400)
+
+col1 = st.columns(1)[0]
+
+with col1:
+    st.subheader(f"{select_column} vs Price")
+    st.altair_chart(scatter)
 
 
 # ## Variables and there effects
