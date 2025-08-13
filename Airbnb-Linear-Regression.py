@@ -802,29 +802,67 @@ adj_r2_train = model.rsquared_adj
 
 # ### Introduction
 
-# In[876]:
+# In[1063]:
 
 
-st.title(":orange[Boston Airbnb Price Model]")
-st.write("This dashboard will analyze 1 year of Boston airbnb data to understand what variables effect the price of airbnb's in the Boston Area.")
+col1, col2, col3 = st.columns(3)
+
+with col2:
+    st.title(":orange[Boston Airbnb Price Model]")
+    st.write("This dashboard will analyze 1 year of Boston airbnb data to understand what variables effect the price of airbnb's in the Boston Area.")
 
 
-# In[800]:
+# ### General Facts about starting Dataset
+
+# In[1068]:
+
+
+#min_price
+#max_price
+#median_price
+
+
+col1, col2, col3 = st.columns(3)
 
 
 
+with col1:
+    st.metric('Minimum Price Used in Model', value = pre_scaled_df['price'].min())
+
+with col2:
+    st.metric('Median Price Used in Model', value = pre_scaled_df['price'].median())
+
+with col3:
+    st.metric('Maximum Price Used in Model', value = pre_scaled_df['price'].max())
 
 
-# ### Variable Effects
+# ### Split into Binary and Continuous Variables
 
-# In[1020]:
+# In[1043]:
 
 
-#columns to view
 columns = list(model.params.index)
 columns.remove('const')
 
-select_column = st.selectbox("Select a column to view price relationship:", columns)
+#create an empty binary and continuous col list
+binary_col = []
+cont_col = []
+
+#seperate into two seperate lists one for continuous values and one for binary values
+for col in columns:
+    uni_val = pre_scaled_df[col].nunique()
+    if uni_val == 2:
+        binary_col.append(col)
+    else:
+        cont_col.append(col)
+
+
+# ### Variable Effects: Continous
+
+# In[1045]:
+
+
+select_column = st.selectbox("Select a column to view price relationship:", cont_col)
 
 #get x and y variables
 x = select_column
@@ -884,31 +922,18 @@ with col1:
     st.altair_chart(combined_chart, use_container_width=True)
 
 
-# In[1014]:
+# ### Create a Chart to analyze binary columns
+
+# In[ ]:
 
 
-pre_scaled_df[['price', select_column]].groupby(select_column).mean().reset_index()
 
-#get the count of unique values
-unique_count = pre_scaled_df[select_column].nunique()
 
-#if the count of unique values is low enough than group them as normal without binning
-if unique_count <= 10:
-    mean_df = pre_scaled_df[['price', select_column]].groupby(select_column).mean().reset_index()
 
-#otherwise binning is necessary
-else:
-    use_df = pre_scaled_df.copy()
-    use_df[f'{select_column}_binned'] = pd.cut(use_df[select_column],
-                                              bins=10,
-                                              precision=1)
+# In[ ]:
 
-    #get the means by the bin
-    mean_df = use_df.groupby(f'{select_column}_binned')['price'].mean().reset_index()
 
-    #create new column bin_label that is a string
-    mean_df['bin_label'] = mean_df[f'{select_column}_binned'].astype(str)
-    mean_df[select_column] = mean_df[f'{select_column}_binned'].apply(lambda x: x.mid)
+
 
 
 # ## Variables and there effects
