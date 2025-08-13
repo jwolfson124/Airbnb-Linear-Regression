@@ -766,7 +766,7 @@ st.write("App Passed Phase 7")
 
 # ## Test the Model
 
-# In[762]:
+# In[826]:
 
 
 #predict based on the model
@@ -775,11 +775,11 @@ y_pred = np.exp(y_pred_log)
 
 #r2 test results
 r2_test = r2_score(y_test, y_pred)
-print("R-Squared of the Test Data:", r2)
+#print("R-Squared of the Test Data:", r2)
 
 #mse_test results
 mse_test = root_mean_squared_error(y_test, y_pred)
-print("Mean Squared Error of the Test Data:", mse)
+#print("Mean Squared Error of the Test Data:", mse)
 
 
 st.write("App Passed Phase 8")
