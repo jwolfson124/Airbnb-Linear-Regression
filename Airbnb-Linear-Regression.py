@@ -957,7 +957,7 @@ with col1:
 #select_column2 = st.selectbox("Select a binary column to view relationship to Airbnb Price", binary_col)
 
 #create the violin price chart
-bw_plot = alt.Chart(pre_scaled_df).mark_boxplot(size=64).encode(
+bw_plot = alt.Chart(pre_scaled_df).mark_boxplot(size=200).encode(
     x=alt.X(f'{select_column2}:N', title=select_column2),
     y=alt.Y('price:Q', title='Price'),
 color=alt.Color(f'{select_column2}:N', legend=None)
