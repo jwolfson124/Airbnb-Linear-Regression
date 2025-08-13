@@ -950,16 +950,20 @@ with col1:
 
 # ### Create a Chart to analyze binary columns
 
-# In[1162]:
+# In[1180]:
 
 
 #create the select column from the binary columns
 #select_column2 = st.selectbox("Select a binary column to view relationship to Airbnb Price", binary_col)
 
 #create the violin price chart
-bw_plot = alt.Chart(pre_scaled_df).mark_boxplot(size=200, #size of the boxplots
-                                                stroke='white', #color of outlines
-                                                strokeWidth=1.5).encode( #width of the outlines
+bw_plot = alt.Chart(pre_scaled_df).mark_boxplot(size=200, #width of boxplot
+                                                box=alt.MarkConfig(stroke='white', strokeWidth=1.5),
+                                                median=alt.MarkConfig(stroke='white', strokeWidth=2),
+                                                rule=alt.MarkConfig(stroke='white', strokeWidth=1),
+                                                ticks=alt.MarkConfig(stroke='white'),
+                                                outliers=alt.MarkConfig(stroke='white', opacity=0.7)
+                                               ).encode(
     x=alt.X(f'{select_column2}:N', title=select_column2),
     y=alt.Y('price:Q', title='Price'),
 color=alt.Color(f'{select_column2}:N', legend=None)
