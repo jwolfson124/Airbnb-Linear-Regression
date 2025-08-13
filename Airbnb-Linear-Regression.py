@@ -817,7 +817,7 @@ st.write("This dashboard will analyze 1 year of Boston airbnb data to understand
 
 # ### Variable Effects
 
-# In[1016]:
+# In[1020]:
 
 
 #columns to view
@@ -853,12 +853,12 @@ else:
 
     #create new column bin_label that is a string
     mean_df['bin_label'] = mean_df[f'{select_column}_binned'].astype(str)
-    mean_df[select_column] = mean_df[f'{select_column}_binned'].apply(lambda x: x.mid)
+    mean_df[select_column] = mean_df[f'{select_column}_binned'].apply(lambda x: round(x.mid))
 
 
 
 #create the bar chart
-bar = alt.Chart(mean_df).mark_bar(size=64, opacity=0.6).encode(
+bar = alt.Chart(mean_df).mark_bar(size=64, opacity=1).encode(
     x=alt.X(f"{select_column}:O", 
             title=select_column,
            sort = alt.SortField(field=select_column, order='ascending')),
