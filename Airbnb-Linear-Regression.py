@@ -798,6 +798,12 @@ adj_r2_train = model.rsquared_adj
 
 
 
+# In[1074]:
+
+
+
+
+
 # # Time to build the App
 
 # ### Introduction
@@ -814,7 +820,7 @@ with col2:
 
 # ### General Facts about starting Dataset
 
-# In[1068]:
+# In[1076]:
 
 
 #min_price
@@ -822,7 +828,7 @@ with col2:
 #median_price
 
 
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 
 
 
@@ -835,10 +841,13 @@ with col2:
 with col3:
     st.metric('Maximum Price Used in Model', value = pre_scaled_df['price'].max())
 
+with col4:
+    st.metric('Total Variables Used in Model', value=len(model.params))
+
 
 # ### Split into Binary and Continuous Variables
 
-# In[1043]:
+# In[1078]:
 
 
 columns = list(model.params.index)
@@ -856,17 +865,20 @@ for col in columns:
     else:
         cont_col.append(col)
 
+len(binary_col) + len(cont_col)
+
 
 # ### Variable Effects: Continous
 
-# In[1045]:
+# In[1094]:
 
 
-select_column = st.selectbox("Select a column to view price relationship:", cont_col)
+select_column = st.selectbox("Select a continuous column to view relationship to Airbnb Price", cont_col)
 
 #get x and y variables
-x = select_column
-y = 'price'
+#x = select_column
+#y = 'price'
+
 
 #create a df to look at the average price
 #pre_scaled_df[['price', select_column]].groupby(select_column).mean().reset_index()
@@ -923,6 +935,38 @@ with col1:
 
 
 # ### Create a Chart to analyze binary columns
+
+# In[1104]:
+
+
+#create the select column from the binary columns
+select_column = st.selectbox("Select a binary column to view relationship to Airbnb Price", binary_col)
+
+#create the violin price chart
+violin_price = alt.Chart(pre_scaled_df).transform_density(
+    'price',
+    as_=['price', 'density'],
+    groupby=[select_column]
+).mark_area(
+    orient='horizontal',
+    opacity=0.7
+).encode(
+    x=alt.X('density:Q', stack='center', axis=alt.Axis(labels=False)),
+    y=alt.Y('price:Q', title='Price'),
+    color=alt.Color(f'{select_column}:N', title=select_column.title()),
+    column=alt.Column(f'{select_column}:N', title=select_column.title())
+).properties(
+    width=150, 
+    height=400
+)
+
+
+with col2:
+    st.subheader(f'{select_column} vs Average Price')
+    st.altair_chart(violin_price)
+
+
+# ### Create the first set of two graphs to explore the data
 
 # In[ ]:
 
