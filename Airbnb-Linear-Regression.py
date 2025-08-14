@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[832]:
+# In[1322]:
 
 
 ##import the entire dataset in a way where we can just add the next file in with no issues
@@ -744,7 +744,7 @@ x_test_int = x_test_int[x_vif_train]
 
 # ## Build the Model
 
-# In[872]:
+# In[1302]:
 
 
 def stepwise_selection(x_train, y_train, threshold = 0.05):
@@ -769,33 +769,30 @@ model_columns, model = stepwise_selection(x_train_int, y_train_log, threshold=0.
 #st.write("App Passed Phase 7")
 
 
+# In[1284]:
+
+
+
+
+
 # ## Test the Model
 
-# In[874]:
+# In[1326]:
 
 
-#predict based on the model
-y_pred_log = model.predict(x_test_int[model_columns])
-y_pred = np.exp(y_pred_log)
+#predict using the scaled data
+y_pred_train = model.predict(x_train_int[model_columns])
+y_pred_test = model.predict(x_test_int[model_columns])
 
-#r2 test results
-r2_test = r2_score(y_test, y_pred)
-#print("R-Squared of the Test Data:", r2)
-
-#mse_test results
-mse_test = root_mean_squared_error(y_test, y_pred)
-#print("Mean Squared Error of the Test Data:", mse)
-
-
-#st.write("App Passed Phase 8")
-
-st.write(f"R-Squared Test: {r2_test}")
-st.write(f"MSE Test: {mse_test}")
-
-#get the train values for r2 and adj_r2
+#training model metrics
 r2_train = model.rsquared
 adj_r2_train = model.rsquared_adj
+rmse_train = root_mean_squared_error(y_train, y_pred_train)
 
+#testing model metrics
+r2_test = r2_score(y_test, y_pred)
+adj_r2_test = 1 - (1-r2_test) *((n-1) / (n - k - 1))
+rmse_test = root_mean_squared_error(y_test, y_pred_test)
 
 
 # In[1074]:
@@ -811,6 +808,7 @@ adj_r2_train = model.rsquared_adj
 # In[1063]:
 
 
+#only use the middle so that it is centralized -> little tricks
 col1, col2, col3 = st.columns(3)
 
 with col2:
@@ -820,29 +818,30 @@ with col2:
 
 # ### General Facts about starting Dataset
 
-# In[1076]:
+# In[1202]:
 
 
-#min_price
-#max_price
-#median_price
+#median, max, min, total parameters, and total neighborhoods in the model
 
 
-col1, col2, col3, col4 = st.columns(4)
+col1, col2, col3, col4, col5 = st.columns(5)
 
 
 
 with col1:
-    st.metric('Minimum Price Used in Model', value = pre_scaled_df['price'].min())
+    st.metric('Minimum Price Used in Model', value = "$" +str(pre_scaled_df['price'].min()))
 
 with col2:
-    st.metric('Median Price Used in Model', value = pre_scaled_df['price'].median())
+    st.metric('Median Price Used in Model', value = "$" + str(pre_scaled_df['price'].median()))
 
 with col3:
-    st.metric('Maximum Price Used in Model', value = pre_scaled_df['price'].max())
+    st.metric('Maximum Price Used in Model', value = "$" + str(pre_scaled_df['price'].max()))
 
 with col4:
     st.metric('Total Variables Used in Model', value=len(model.params))
+
+with col5:
+    st.metric('Total Boston Neighborhoods used in Model', value = len([col for col in list(model.params.index) if 'neighbourhood' in col]))
 
 
 # ### Split into Binary and Continuous Variables
@@ -950,24 +949,26 @@ with col1:
 
 # ### Create a Chart to analyze binary columns
 
-# In[1180]:
+# In[1222]:
 
 
 #create the select column from the binary columns
 #select_column2 = st.selectbox("Select a binary column to view relationship to Airbnb Price", binary_col)
 
+pre_scaled_df['legend_col'] = pre_scaled_df[select_column2].map({0: 'No', 1:'Yes'})
+
 #create the violin price chart
-bw_plot = alt.Chart(pre_scaled_df).mark_boxplot(size=200, #width of boxplot
-                                                box=alt.MarkConfig(stroke='white', strokeWidth=1.5),
-                                                median=alt.MarkConfig(stroke='white', strokeWidth=2),
-                                                rule=alt.MarkConfig(stroke='white', strokeWidth=1),
-                                                ticks=alt.MarkConfig(stroke='white'),
-                                                outliers=alt.MarkConfig(stroke='white', opacity=0.7)
+bw_plot = alt.Chart(pre_scaled_df).mark_boxplot(size=160, #width of boxplot
+                                                box=alt.MarkConfig(stroke='white', strokeWidth=1.5), #outline of the box
+                                                median=alt.MarkConfig(color='white', strokeWidth=2), #median
+                                                rule=alt.MarkConfig(color='white', strokeWidth=1), #whiskers
+                                                ticks=alt.MarkConfig(color='white'), #whisker end ticks
+                                                outliers=alt.MarkConfig(color='white', opacity=0.7) #outliers
                                                ).encode(
-    x=alt.X(f'{select_column2}:N', title=select_column2),
+    x=alt.X(f'legend_col:N', title=select_column2),
     y=alt.Y('price:Q', title='Price'),
-color=alt.Color(f'{select_column2}:N', legend=None).properties(width=650, height=100)
-)
+color=alt.Color(f'{select_column2}:N', legend=None)
+).properties(width=650, height=400)
 
 
 with col2:
@@ -975,18 +976,44 @@ with col2:
     st.altair_chart(bw_plot)
 
 
-# ### Create the first set of two graphs to explore the data
+# # Model Output Analysis
 
-# In[ ]:
+# ### Print out the r2 and adj_r2 and rmse for the test and train
 
-
-
-
-
-# In[ ]:
+# In[1341]:
 
 
+col1, col2, col3, col4, col5, col6 = st.columns(6)
 
+with col1:
+    st.metric("R-Squared Train", value=r2_train)
+
+with col2:
+    st.metric("R-Squared Test", value=r2_test)
+
+with col3:
+    st.metric("Adjusted R-Squared Train", value=adj_r2_train)
+
+with col4:
+    st.metric("Adjusted R-Squared Test", value=adj_r2_test)
+
+with col5:
+    st.metric("Root Mean Squared Error Train", value=rmse_train)
+
+with col6:
+    st.metric("Root Mean Squared Error Train", value=rmse_test)
+
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.write("The R-Squared measure explains the variance in the price the model explains. This means the model explains ~56 - 65% of the variation")
+
+with col2:
+    st.write("The Adjusted R-Squared penalizes for the number of predictors(columns) used in the model. These results show similar information as the R-Squared")
+
+with col3:
+    st.write("The Root Mean Squared Error Test shows the average error size from the price. This shows that the model on average is $232 off from the price")
 
 
 # ## Variables and there effects
@@ -1000,7 +1027,7 @@ effect_df = model.params.to_frame("coef").reset_index().rename(columns = {"index
 effect_df = effect_df.sort_values(by="coef")
 
 
-# In[661]:
+# In[1184]:
 
 
 
