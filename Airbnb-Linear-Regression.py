@@ -1028,7 +1028,7 @@ with col3:
 
 # ## Variables and there effects
 
-# In[327]:
+# In[404]:
 
 
 #overall effects
@@ -1040,8 +1040,6 @@ effect_df = effect_df.sort_values(by="coef")
 #add back in rows that were removed to make sure we could accurately calculate VIF
 new_rows = [
     {'Variable Name': 'neighbourhood_South Boston', 'coef' : 0},
-    {'Variable Name': 'room_Entire home/apt', 'coef' : 0},
-    {'Variable Name': 'calendar_June - 2025', 'coef' : 0}
 ]
 
 effect_df = pd.concat([effect_df, pd.DataFrame(new_rows)], ignore_index=True)
@@ -1050,18 +1048,44 @@ effect_df['Percent Effect'] = effect_df['coef'].apply(lambda x: (np.exp(x) - 1) 
 
 #split into the 4 different dataframes that will be used to pick apart the dataframe and create the visuals
 #lists the prefixes used and const as they will be used to get an "others" dataframe
-list_of_prefixes = ('neighbourhood', 'room', 'calendar', 'const')
+list_of_prefixes = ('neighbourhood', 'const', 'calendar')
 
 neighbourhood_df = effect_df[effect_df['Variable Name'].str.startswith('neighbourhood')].copy()
-room_df = effect_df[effect_df['Variable Name'].str.startswith('room')].copy()
-calendar_df = effect_df[effect_df['Variable Name'].str.startswith('calendar')].copy()
-others = effect_df[~effect_df['Variable Name'].str.startswith(list_of_prefixes)].copy()
+others_df = effect_df[~effect_df['Variable Name'].str.startswith(list_of_prefixes)].copy()
+
+#also remove the missing column from visualizing as this was used as a way to let the ML model know data was imputed
+others_df = others_df[~others_df['Variable Name'].str.contains('missing')]
 
 
 #remove prefixes from the created lists so they visualize better
 neighbourhood_df['Variable Name'] = neighbourhood_df['Variable Name'].str.removeprefix('neighbourhood_')
-room_df['Variable Name'] = room_df['Variable Name'].str.removeprefix('room_')
-calendar_df['Variable Name'] = calendar_df['Variable Name'].str.removeprefix('calendar_')
+
+others_df['Variable Name'] = others_df['Variable Name'].str.removeprefix('room_')
+
+
+
+# In[414]:
+
+
+map_names = {
+    'minimum_nights' : 'min nights',
+    'host_since_years' : 'host_years',
+    'calculated_host_listings_count' : 'host_listings',
+    'number_of_reviews' : 'total_reviews',
+    'maximum_nights' : 'max nights',
+    'review_scores_cleanliness' : 'reviews_clean',
+    'review_scores_rating' : 'reviews_rank',
+}
+
+others_df['Variable Name'] = others_df['Variable Name'].replace(map_names)
+
+others_df = others_df[~others_df['Variable Name'].str.contains('review')]
+
+
+# ### Create the charts that will be used
+
+# In[416]:
+
 
 #create a function to create the different bar charts that will be used
 def create_bar(df, x, y, colors = 'blues'):
@@ -1077,9 +1101,8 @@ def create_bar(df, x, y, colors = 'blues'):
 
 #create the different charts to visualize effect
 neighbourhood_chart = create_bar(neighbourhood_df, 'Variable Name', 'Percent Effect')
-room_chart = create_bar(room_df, 'Variable Name', 'Percent Effect')
-calendar_chart = create_bar(calendar_df, 'Variable Name', 'Percent Effect')
-other_chart = create_bar(others, 'Variable Name', 'Percent Effect')
+
+other_chart = create_bar(others_df, 'Variable Name', 'Percent Effect')
 
 
 #create the different charts and show their effects on the Price
@@ -1087,25 +1110,8 @@ st.subheader(f'Neighbourhood vs Percent Effect on Price')
 st.altair_chart(neighbourhood_chart)
 
 
-col1, col2 = st.columns(2)
-
-with col1:
-    st.subheader(f'Room Type vs Percent Effect on Price')
-    st.altair_chart(room_chart)
-
-with col2:
-    st.subheader(f'Time of Airbnb Data Upload vs Percent Effect on Price')
-    st.altair_chart(calendar_chart)
-
-
 st.subheader(f'Non-Grouped Variables vs Percent Effect on Price')
 st.altair_chart(other_chart)
-
-
-# In[ ]:
-
-
-
 
 
 # In[ ]:
