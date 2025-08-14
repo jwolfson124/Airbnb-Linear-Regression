@@ -1099,7 +1099,7 @@ with col2:
 
 
 st.subheader(f'Non-Grouped Variables vs Percent Effect on Price')
-st.altair_chart(others)
+st.altair_chart(other_chart)
 
 
 # In[ ]:
