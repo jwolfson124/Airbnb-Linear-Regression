@@ -1028,7 +1028,7 @@ with col3:
 
 # ## Variables and there effects
 
-# In[404]:
+# In[420]:
 
 
 #overall effects
@@ -1064,7 +1064,13 @@ others_df['Variable Name'] = others_df['Variable Name'].str.removeprefix('room_'
 
 
 
-# In[414]:
+# In[422]:
+
+
+
+
+
+# In[426]:
 
 
 map_names = {
@@ -1075,6 +1081,8 @@ map_names = {
     'maximum_nights' : 'max nights',
     'review_scores_cleanliness' : 'reviews_clean',
     'review_scores_rating' : 'reviews_rank',
+    'reviews_per_month' : 'total monthly reviews',
+    'review_scores_checkin' : 'checkin exp'
 }
 
 others_df['Variable Name'] = others_df['Variable Name'].replace(map_names)
@@ -1084,7 +1092,7 @@ others_df = others_df[~others_df['Variable Name'].str.contains('review')]
 
 # ### Create the charts that will be used
 
-# In[416]:
+# In[428]:
 
 
 #create a function to create the different bar charts that will be used
@@ -1110,7 +1118,7 @@ st.subheader(f'Neighbourhood vs Percent Effect on Price')
 st.altair_chart(neighbourhood_chart)
 
 
-st.subheader(f'Non-Grouped Variables vs Percent Effect on Price')
+st.subheader(f'Non-Neighbourhood Variables vs Percent Effect on Price')
 st.altair_chart(other_chart)
 
 
