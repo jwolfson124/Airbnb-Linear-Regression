@@ -1028,7 +1028,7 @@ with col3:
 
 # ## Variables and there effects
 
-# In[317]:
+# In[327]:
 
 
 #overall effects
@@ -1053,13 +1053,15 @@ effect_df['Percent Effect'] = effect_df['coef'].apply(lambda x: (np.exp(x) - 1) 
 list_of_prefixes = ('neighbourhood', 'room', 'calendar', 'const')
 
 neighbourhood_df = effect_df[effect_df['Variable Name'].str.startswith('neighbourhood')].copy()
-room_list = effect_df[effect_df['Variable Name'].str.startswith('room')].copy()
-calendar_list = effect_df[effect_df['Variable Name'].str.startswith('calendar')].copy()
+room_df = effect_df[effect_df['Variable Name'].str.startswith('room')].copy()
+calendar_df = effect_df[effect_df['Variable Name'].str.startswith('calendar')].copy()
 others = effect_df[~effect_df['Variable Name'].str.startswith(list_of_prefixes)].copy()
 
 
 #remove prefixes from the created lists so they visualize better
 neighbourhood_df['Variable Name'] = neighbourhood_df['Variable Name'].str.removeprefix('neighbourhood_')
+room_df['Variable Name'] = room_df['Variable Name'].str.removeprefix('room_')
+calendar_df['Variable Name'] = calendar_df['Variable Name'].str.removeprefix('calendar_')
 
 #create a function to create the different bar charts that will be used
 def create_bar(df, x, y, colors = 'blues'):
@@ -1073,15 +1075,31 @@ def create_bar(df, x, y, colors = 'blues'):
 
     return bar
 
+#create the different charts to visualize effect
 neighbourhood_chart = create_bar(neighbourhood_df, 'Variable Name', 'Percent Effect')
+room_chart = create_bar(room_df, 'Variable Name', 'Percent Effect')
+calendar_chart = create_bar(calendar_df, 'Variable Name', 'Percent Effect')
+other_chart = create_bar(others, 'Variable Name', 'Percent Effect')
 
 
+#create the different charts and show their effects on the Price
 st.subheader(f'Neighbourhood vs Percent Effect on Price')
 st.altair_chart(neighbourhood_chart)
-    
 
 
 col1, col2 = st.columns(2)
+
+with col1:
+    st.subheader(f'Room Type vs Percent Effect on Price')
+    st.altair_chart(room_chart)
+
+with col2:
+    st.subheader(f'Time of Airbnb Data Upload vs Percent Effect on Price')
+    st.altair_chart(calendar_chart)
+
+
+st.subheader(f'Non-Grouped Variables vs Percent Effect on Price')
+st.altair_chart(others)
 
 
 # In[ ]:
