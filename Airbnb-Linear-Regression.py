@@ -1028,7 +1028,7 @@ with col3:
 
 # ## Variables and there effects
 
-# In[264]:
+# In[266]:
 
 
 #overall effects
@@ -1071,11 +1071,9 @@ def create_bar(df, x, y, colors = 'blues'):
 
 neighbourhood_chart = create_bar(neighbourhood_df, 'Variable Name', 'Percent Effect')
 
-col1, col2 = st.columns(2)
 
-with col1:
-    st.subheader(f'Neighbourhood vs Percent Effect on Price')
-    st.altair_chart(neighbourhood_chart)
+st.subheader(f'Neighbourhood vs Percent Effect on Price')
+st.altair_chart(neighbourhood_chart)
     
 
 
