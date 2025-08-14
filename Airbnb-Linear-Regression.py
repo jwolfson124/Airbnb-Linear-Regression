@@ -798,15 +798,10 @@ adj_r2_test = 1 - (1-r2_test) *((n-1) / (n - k - 1))
 rmse_test = root_mean_squared_error(y_test_log, y_pred_test)
 
 
-# In[126]:
+# In[ ]:
 
 
-print(r2_train)
-print(r2_test)
-print(adj_r2_train)
-print(adj_r2_test)
-print(rmse_train)
-print(rmse_test)
+
 
 
 # In[ ]:
@@ -1033,16 +1028,62 @@ with col3:
 
 # ## Variables and there effects
 
-# In[646]:
+# In[248]:
 
 
 #overall effects
-effect_df = model.params.to_frame("coef").reset_index().rename(columns = {"index": 'Var Name'})
+effect_df = model.params.to_frame("coef").reset_index().rename(columns = {"index": 'Variable Name'})
 
+#create a dataframe that holds the varname and coef
 effect_df = effect_df.sort_values(by="coef")
 
+#add back in rows that were removed to make sure we could accurately calculate VIF
+new_rows = [
+    {'Variable Name': 'neighbourhood_South Boston', 'coef' : 0},
+    {'Variable Name': 'room_Entire home/apt', 'coef' : 0},
+    {'Variable Name': 'calendar_June - 2025', 'coef' : 0}
+]
 
-# In[1184]:
+effect_df = pd.concat([effect_df, pd.DataFrame(new_rows)], ignore_index=True)
+
+effect_df['Percentage Effect'] = effect_df['coef'].apply(lambda x: (np.exp(x) - 1) * 100)
+
+#split into the 4 different dataframes that will be used to pick apart the dataframe and create the visuals
+#lists the prefixes used and const as they will be used to get an "others" dataframe
+list_of_prefixes = ('neighbourhood', 'room', 'calendar', 'const')
+
+neighbourhood_df = effect_df[effect_df['Variable Name'].str.startswith('neighbourhood')]
+room_list = effect_df[effect_df['Variable Name'].str.startswith('room')]
+calendar_list = effect_df[effect_df['Variable Name'].str.startswith('calendar')]
+others = effect_df[~effect_df['Variable Name'].str.startswith(list_of_prefixes)]
+
+#create a function to create the different bar charts that will be used
+def create_bar(df, x, y, colors = 'blues'):
+    bar = alt.Chart(df).mark_bar(size=64, opacity=1).encode(
+     x=alt.X(f"{x}:O", 
+             title=x,
+            sort = alt.SortField(field=x, order='ascending')),
+     y=alt.Y(f"{y}:Q", title=y),
+     tooltip=[alt.Tooltip(f"{x}:O"), alt.Tooltip(f"{y}:Q", format=",.0f")],
+     color=alt.Color(f"{x}:Q", scale=alt.Scale(scheme=colors),legend=None)).properties(width=650, height=400)
+
+    return bar
+
+
+col1, col2 = st.columns(2)
+
+with col1:
+    st.subheader(f'Neighbourhood vs Percent Effect on Price')
+    st.altair_chart(create_bar(neighbourhood_df, 'Variable Name', 'Percent Effect'))
+    
+
+
+col1, col2 = st.columns(2)
+
+
+
+
+# In[ ]:
 
 
 
