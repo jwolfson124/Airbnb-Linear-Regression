@@ -1028,7 +1028,7 @@ with col3:
 
 # ## Variables and there effects
 
-# In[248]:
+# In[262]:
 
 
 #overall effects
@@ -1046,7 +1046,7 @@ new_rows = [
 
 effect_df = pd.concat([effect_df, pd.DataFrame(new_rows)], ignore_index=True)
 
-effect_df['Percentage Effect'] = effect_df['coef'].apply(lambda x: (np.exp(x) - 1) * 100)
+effect_df['Percent Effect'] = effect_df['coef'].apply(lambda x: (np.exp(x) - 1) * 100)
 
 #split into the 4 different dataframes that will be used to pick apart the dataframe and create the visuals
 #lists the prefixes used and const as they will be used to get an "others" dataframe
@@ -1065,22 +1065,21 @@ def create_bar(df, x, y, colors = 'blues'):
             sort = alt.SortField(field=x, order='ascending')),
      y=alt.Y(f"{y}:Q", title=y),
      tooltip=[alt.Tooltip(f"{x}:O"), alt.Tooltip(f"{y}:Q", format=",.0f")],
-     color=alt.Color(f"{x}:Q", scale=alt.Scale(scheme=colors),legend=None)).properties(width=650, height=400)
+     color=alt.Color(f"{y}:Q", scale=alt.Scale(scheme=colors),legend=None)).properties(width=650, height=400)
 
     return bar
 
+neighbourhood_chart = create_bar(neighbourhood_df, 'Variable Name', 'Percent Effect')
 
 col1, col2 = st.columns(2)
 
 with col1:
     st.subheader(f'Neighbourhood vs Percent Effect on Price')
-    st.altair_chart(create_bar(neighbourhood_df, 'Variable Name', 'Percent Effect'))
+    st.altair_chart(neighbourhood_chart)
     
 
 
 col1, col2 = st.columns(2)
-
-
 
 
 # In[ ]:
