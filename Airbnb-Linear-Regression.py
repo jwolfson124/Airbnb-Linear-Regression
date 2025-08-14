@@ -790,6 +790,8 @@ adj_r2_train = model.rsquared_adj
 rmse_train = root_mean_squared_error(y_train, y_pred_train)
 
 #testing model metrics
+k = len(model.params) - 1
+n = len(y_test)
 r2_test = r2_score(y_test, y_pred_test)
 adj_r2_test = 1 - (1-r2_test) *((n-1) / (n - k - 1))
 rmse_test = root_mean_squared_error(y_test, y_pred_test)
