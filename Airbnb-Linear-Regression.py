@@ -1028,7 +1028,7 @@ with col3:
 
 # ## Variables and there effects
 
-# In[262]:
+# In[264]:
 
 
 #overall effects
@@ -1062,7 +1062,7 @@ def create_bar(df, x, y, colors = 'blues'):
     bar = alt.Chart(df).mark_bar(size=64, opacity=1).encode(
      x=alt.X(f"{x}:O", 
              title=x,
-            sort = alt.SortField(field=x, order='ascending')),
+            sort = alt.SortField(field=y, order='ascending')),
      y=alt.Y(f"{y}:Q", title=y),
      tooltip=[alt.Tooltip(f"{x}:O"), alt.Tooltip(f"{y}:Q", format=",.0f")],
      color=alt.Color(f"{y}:Q", scale=alt.Scale(scheme=colors),legend=None)).properties(width=650, height=400)
