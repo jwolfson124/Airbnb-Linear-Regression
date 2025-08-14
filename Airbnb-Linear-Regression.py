@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1322]:
+# In[1]:
 
 
 ##import the entire dataset in a way where we can just add the next file in with no issues
@@ -86,52 +86,52 @@ print(report_df)
 
 
 
-# In[834]:
+# In[3]:
 
 
-# # Step 1: Set the folder path
-# folder_path = "/Users/student/Desktop/Dashboard Work/Linear Model House Pricing/Air BnB Data"
-# excel_files = glob.glob(os.path.join(folder_path, "*.xls"))
+# Step 1: Set the folder path
+folder_path = "/Users/student/Desktop/Dashboard Work/Linear Model House Pricing/Air BnB Data"
+excel_files = glob.glob(os.path.join(folder_path, "*.xls"))
 
-# # Step 2: Find all unique columns across the files
-# all_columns = set()
-# file_columns_map = {}
+# Step 2: Find all unique columns across the files
+all_columns = set()
+file_columns_map = {}
 
-# for file in excel_files:
-#     df = pd.read_excel(file, nrows=1)  # Read header only
-#     file_columns_map[file] = set(df.columns)
-#     all_columns.update(df.columns)
+for file in excel_files:
+    df = pd.read_excel(file, nrows=1)  # Read header only
+    file_columns_map[file] = set(df.columns)
+    all_columns.update(df.columns)
 
-# all_columns = list(all_columns)
+all_columns = list(all_columns)
 
-# # Step 3: Load data and align all columns
-# dfs = []
-# missing_column_report = []
+# Step 3: Load data and align all columns
+dfs = []
+missing_column_report = []
 
-# for file in excel_files:
-#     df = pd.read_excel(file)
-#     original_cols = set(df.columns)
-#     missing_cols = list(set(all_columns) - original_cols)
+for file in excel_files:
+    df = pd.read_excel(file)
+    original_cols = set(df.columns)
+    missing_cols = list(set(all_columns) - original_cols)
 
-#     # Reindex with all columns so missing ones are filled with NaN
-#     df = df.reindex(columns=all_columns)
+    # Reindex with all columns so missing ones are filled with NaN
+    df = df.reindex(columns=all_columns)
 
-#     # Optional: add a column to indicate which file the data came from
-#     df['source_file'] = os.path.basename(file)
-#     dfs.append(df)
+    # Optional: add a column to indicate which file the data came from
+    df['source_file'] = os.path.basename(file)
+    dfs.append(df)
 
-#     # Track which columns were missing in this file
-#     if missing_cols:
-#         missing_column_report.append({
-#             'file': os.path.basename(file),
-#             'missing_columns': missing_cols
-#         })
+    # Track which columns were missing in this file
+    if missing_cols:
+        missing_column_report.append({
+            'file': os.path.basename(file),
+            'missing_columns': missing_cols
+        })
 
-# # Step 4: Combine all into one large DataFrame
-# combined_df = pd.concat(dfs, ignore_index=True)
+# Step 4: Combine all into one large DataFrame
+combined_df = pd.concat(dfs, ignore_index=True)
 
-# # Step 5: Create and print report of missing columns
-# report_df = pd.DataFrame(missing_column_report)
+# Step 5: Create and print report of missing columns
+report_df = pd.DataFrame(missing_column_report)
 
 
 # In[ ]:
@@ -142,7 +142,7 @@ print(report_df)
 
 # ## Identify columns that are not consistent and remove them from df
 
-# In[836]:
+# In[5]:
 
 
 #columns to drop
@@ -173,7 +173,7 @@ df = df.drop(columns=column_drop)#, inplace=True)
 
 # # Identify Columns that will not be useful to the algorythm
 
-# In[838]:
+# In[7]:
 
 
 #remove URL
@@ -210,7 +210,7 @@ original_df = df.copy()
 
 # ## Change any datetime columns to integer values
 
-# In[840]:
+# In[9]:
 
 
 #columns that need to be changed
@@ -235,7 +235,7 @@ small_df['calendar_last_scraped'] = small_df['calendar_last_scraped'].dt.strftim
 
 # ## Change categorical values into dummy variables
 
-# In[842]:
+# In[11]:
 
 
 df = small_df.copy()
@@ -263,7 +263,7 @@ print(df['amenities'])
 
 # ## Use Total Number of Amenities Instead of Individual
 
-# In[844]:
+# In[15]:
 
 
 #the ast.literal_eval turns the string that holds a list into just a list of the different amenities
@@ -275,7 +275,7 @@ df['amenities'] = df['amenities'].apply(ast.literal_eval).apply(lambda x: ','.jo
 #df_dummies
 
 
-# In[846]:
+# In[17]:
 
 
 def count_amenities(amenities_str):
@@ -306,7 +306,7 @@ df['amenities'] = df['amenities'].apply(count_amenities)
 
 # ## Get dummy values and apply prefix to help with organizatioon
 
-# In[848]:
+# In[19]:
 
 
 #create a list of dummy columns
@@ -322,7 +322,7 @@ dummy_values = pd.get_dummies(df[dummy_cols],prefix=prefix, dtype='uint8', spars
 df = pd.concat([df, dummy_values], axis=1).drop(columns=dummy_cols)
 
 
-# In[850]:
+# In[21]:
 
 
 timeline_cols = df.columns[df.columns.str.contains('calendar')]
@@ -337,7 +337,7 @@ timeline_cols = df.columns[df.columns.str.contains('calendar')]
 
 # ## identify missing data and how to deal with it the means, medians, max, and min to understand how similar the information is
 
-# In[852]:
+# In[23]:
 
 
 #remove all instances of missing price
@@ -397,7 +397,7 @@ for quarter in timeline_cols:
 
 # ## Based on the above analysis it makes sense to impute the data using the median values for each calendar time period year
 
-# In[854]:
+# In[25]:
 
 
 #create the columns that will hold the missing values and mark them before imputing the median
@@ -432,7 +432,7 @@ for quarter in timeline_cols:
 
 # ## turn all the sparse values into integer or float values
 
-# In[856]:
+# In[27]:
 
 
 #check the dtypes and confirm there are no strings
@@ -449,7 +449,7 @@ for col in column_list:
 
 # ## remove major outliers
 
-# In[858]:
+# In[29]:
 
 
 #create the upper and lower bounds
@@ -461,7 +461,7 @@ mask = (df['price'] >= lower_bound) & (df['price'] <= upper_bound)
 df = df[mask].copy()
 
 
-# In[862]:
+# In[31]:
 
 
 pre_scaled_df = df.copy()
@@ -469,7 +469,7 @@ pre_scaled_df = df.copy()
 
 # ## scale non-binary features
 
-# In[864]:
+# In[33]:
 
 
 #remove price
@@ -509,7 +509,7 @@ df[columns_to_scale] = scaler.fit_transform(df[columns_to_scale])
 
 # ## create a function that will run through the different models and once all values are statistically significant return the model information
 
-# In[866]:
+# In[35]:
 
 
 #set the random seed
@@ -699,7 +699,7 @@ x_test_int = sm.add_constant(x_test, has_constant='add')
 #     i += 1
 
 
-# In[868]:
+# In[37]:
 
 
 #x_vif_train.columns
@@ -729,7 +729,7 @@ x_vif_train = ['const', 'host_is_superhost', 'bathrooms', 'bedrooms', 'beds',
        'reviews_per_month_missing']
 
 
-# In[870]:
+# In[39]:
 
 
 x_train_int = x_train_int[x_vif_train]
@@ -744,7 +744,7 @@ x_test_int = x_test_int[x_vif_train]
 
 # ## Build the Model
 
-# In[1302]:
+# In[69]:
 
 
 def stepwise_selection(x_train, y_train, threshold = 0.05):
@@ -777,7 +777,7 @@ model_columns, model = stepwise_selection(x_train_int, y_train_log, threshold=0.
 
 # ## Test the Model
 
-# In[1326]:
+# In[97]:
 
 
 #predict using the scaled data
@@ -787,17 +787,29 @@ y_pred_test = model.predict(x_test_int[model_columns])
 #training model metrics
 r2_train = model.rsquared
 adj_r2_train = model.rsquared_adj
-rmse_train = root_mean_squared_error(y_train, y_pred_train)
+rmse_train = root_mean_squared_error(y_train_log, y_pred_train)
 
 #testing model metrics
 k = len(model.params) - 1
 n = len(y_test)
-r2_test = r2_score(y_test, y_pred_test)
+
+r2_test = r2_score(y_test_log, y_pred_test)
 adj_r2_test = 1 - (1-r2_test) *((n-1) / (n - k - 1))
-rmse_test = root_mean_squared_error(y_test, y_pred_test)
+rmse_test = root_mean_squared_error(y_test_log, y_pred_test)
 
 
-# In[1074]:
+# In[126]:
+
+
+print(r2_train)
+print(r2_test)
+print(adj_r2_train)
+print(adj_r2_test)
+print(rmse_train)
+print(rmse_test)
+
+
+# In[ ]:
 
 
 
@@ -951,7 +963,7 @@ with col1:
 
 # ### Create a Chart to analyze binary columns
 
-# In[1222]:
+# In[124]:
 
 
 #create the select column from the binary columns
@@ -982,40 +994,41 @@ with col2:
 
 # ### Print out the r2 and adj_r2 and rmse for the test and train
 
-# In[1341]:
+# In[122]:
 
 
 col1, col2, col3, col4, col5, col6 = st.columns(6)
 
 with col1:
-    st.metric("R-Squared Train", value=r2_train)
+    st.metric("R-Squared Train", value= round(r2_train,2))
 
 with col2:
-    st.metric("R-Squared Test", value=r2_test)
+    st.metric("R-Squared Test", value= round(r2_test,2))
 
 with col3:
-    st.metric("Adjusted R-Squared Train", value=adj_r2_train)
+    st.metric("Adjusted R-Squared Train", value= round(adj_r2_train,2))
 
 with col4:
-    st.metric("Adjusted R-Squared Test", value=adj_r2_test)
+    st.metric("Adjusted R-Squared Test", value= round(adj_r2_test,2))
 
 with col5:
-    st.metric("Root Mean Squared Error Train", value=rmse_train)
+    st.metric("Root Mean Squared Error Train", value= round(rmse_train,2))
 
 with col6:
-    st.metric("Root Mean Squared Error Train", value=rmse_test)
+    st.metric("Root Mean Squared Error Train", value= round(rmse_test,2))
 
 
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    st.write("The R-Squared measure explains the variance in the price the model explains. This means the model explains ~56 - 65% of the variation")
+    st.write("The R-Squared measure explains the variance in the price the model explains. This means the model explains ~65% of the variation.")
 
 with col2:
-    st.write("The Adjusted R-Squared penalizes for the number of predictors(columns) used in the model. These results show similar information as the R-Squared")
+    st.write("The Adjusted R-Squared penalizes for the number of predictors(columns) used in the model. These results show similar information as the R-Squared.")
 
 with col3:
-    st.write("The Root Mean Squared Error Test shows the average error size from the price. This shows that the model on average is $232 off from the price")
+    st.write("The Root Mean Squared Error Test shows the average error size from the price. This results show that predictions errors across splits are consistent and usually around ~42.5%. This means the predicted values are normally within ~42.5% of the actual price.")
+
 
 
 # ## Variables and there effects
@@ -1039,4 +1052,24 @@ effect_df = effect_df.sort_values(by="coef")
 
 
 
+
+
+# In[ ]:
+
+
+
+
+
+# In[ ]:
+
+
+
+
+
+# In[120]:
+
+
+st.title(":orange[Conclusion]")
+st.write("Bottom line: this model is doing great with the data we’ve got. It explains about two-thirds of price variation (R² 0.645 train / 0.659 test), and even after penalizing for feature count the story holds (adj-R² 0.643 / 0.653), so we’re capturing real signal—not just fitting noise. Errors on the log scale are steady at 0.384 (train) and 0.366 (test), roughly a ~47% / ~44% typical gap, which is solid given we’re mostly using host-provided listing details and not richer property data (condition, square footage, comps, events). The test slightly edging the train = nice generalization. Overall, given the available data, this model reliably captures how listing features affect nightly price in Boston and does it with stable, well-generalized, and consistent performance!")
+st.write('Link to Data Source: https://insideairbnb.com/get-the-data/')
 
