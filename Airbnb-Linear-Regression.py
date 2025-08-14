@@ -1028,7 +1028,7 @@ with col3:
 
 # ## Variables and there effects
 
-# In[266]:
+# In[317]:
 
 
 #overall effects
@@ -1052,10 +1052,14 @@ effect_df['Percent Effect'] = effect_df['coef'].apply(lambda x: (np.exp(x) - 1) 
 #lists the prefixes used and const as they will be used to get an "others" dataframe
 list_of_prefixes = ('neighbourhood', 'room', 'calendar', 'const')
 
-neighbourhood_df = effect_df[effect_df['Variable Name'].str.startswith('neighbourhood')]
-room_list = effect_df[effect_df['Variable Name'].str.startswith('room')]
-calendar_list = effect_df[effect_df['Variable Name'].str.startswith('calendar')]
-others = effect_df[~effect_df['Variable Name'].str.startswith(list_of_prefixes)]
+neighbourhood_df = effect_df[effect_df['Variable Name'].str.startswith('neighbourhood')].copy()
+room_list = effect_df[effect_df['Variable Name'].str.startswith('room')].copy()
+calendar_list = effect_df[effect_df['Variable Name'].str.startswith('calendar')].copy()
+others = effect_df[~effect_df['Variable Name'].str.startswith(list_of_prefixes)].copy()
+
+
+#remove prefixes from the created lists so they visualize better
+neighbourhood_df['Variable Name'] = neighbourhood_df['Variable Name'].str.removeprefix('neighbourhood_')
 
 #create a function to create the different bar charts that will be used
 def create_bar(df, x, y, colors = 'blues'):
