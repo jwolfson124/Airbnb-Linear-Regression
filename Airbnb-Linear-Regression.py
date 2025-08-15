@@ -943,7 +943,7 @@ bar = alt.Chart(mean_df).mark_bar(size=64, opacity=1).encode(
 trend = alt.Chart(mean_df).mark_line(color='red', strokeWidth = 3).transform_regression(
     select_column, "price").encode(
     x=alt.X(f"{select_column}:Q", axis = None),
-    y=alt.Y("price:Q", axis = None)
+    y=alt.Y("price:Q")
     )
 
 #combined the two
