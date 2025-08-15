@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[432]:
 
 
 ##import the entire dataset in a way where we can just add the next file in with no issues
@@ -86,7 +86,7 @@ print(report_df)
 
 
 
-# In[3]:
+# In[434]:
 
 
 # # Step 1: Set the folder path
@@ -142,7 +142,7 @@ print(report_df)
 
 # ## Identify columns that are not consistent and remove them from df
 
-# In[5]:
+# In[436]:
 
 
 #columns to drop
@@ -173,7 +173,7 @@ df = df.drop(columns=column_drop)#, inplace=True)
 
 # # Identify Columns that will not be useful to the algorythm
 
-# In[7]:
+# In[438]:
 
 
 #remove URL
@@ -210,7 +210,7 @@ original_df = df.copy()
 
 # ## Change any datetime columns to integer values
 
-# In[9]:
+# In[440]:
 
 
 #columns that need to be changed
@@ -235,7 +235,7 @@ small_df['calendar_last_scraped'] = small_df['calendar_last_scraped'].dt.strftim
 
 # ## Change categorical values into dummy variables
 
-# In[11]:
+# In[442]:
 
 
 df = small_df.copy()
@@ -263,7 +263,7 @@ print(df['amenities'])
 
 # ## Use Total Number of Amenities Instead of Individual
 
-# In[15]:
+# In[444]:
 
 
 #the ast.literal_eval turns the string that holds a list into just a list of the different amenities
@@ -275,7 +275,7 @@ df['amenities'] = df['amenities'].apply(ast.literal_eval).apply(lambda x: ','.jo
 #df_dummies
 
 
-# In[17]:
+# In[446]:
 
 
 def count_amenities(amenities_str):
@@ -306,7 +306,7 @@ df['amenities'] = df['amenities'].apply(count_amenities)
 
 # ## Get dummy values and apply prefix to help with organizatioon
 
-# In[19]:
+# In[448]:
 
 
 #create a list of dummy columns
@@ -322,7 +322,7 @@ dummy_values = pd.get_dummies(df[dummy_cols],prefix=prefix, dtype='uint8', spars
 df = pd.concat([df, dummy_values], axis=1).drop(columns=dummy_cols)
 
 
-# In[21]:
+# In[450]:
 
 
 timeline_cols = df.columns[df.columns.str.contains('calendar')]
@@ -337,7 +337,7 @@ timeline_cols = df.columns[df.columns.str.contains('calendar')]
 
 # ## identify missing data and how to deal with it the means, medians, max, and min to understand how similar the information is
 
-# In[23]:
+# In[452]:
 
 
 #remove all instances of missing price
@@ -397,7 +397,7 @@ for quarter in timeline_cols:
 
 # ## Based on the above analysis it makes sense to impute the data using the median values for each calendar time period year
 
-# In[25]:
+# In[454]:
 
 
 #create the columns that will hold the missing values and mark them before imputing the median
@@ -432,7 +432,7 @@ for quarter in timeline_cols:
 
 # ## turn all the sparse values into integer or float values
 
-# In[27]:
+# In[456]:
 
 
 #check the dtypes and confirm there are no strings
@@ -449,7 +449,7 @@ for col in column_list:
 
 # ## remove major outliers
 
-# In[29]:
+# In[458]:
 
 
 #create the upper and lower bounds
@@ -461,7 +461,7 @@ mask = (df['price'] >= lower_bound) & (df['price'] <= upper_bound)
 df = df[mask].copy()
 
 
-# In[31]:
+# In[460]:
 
 
 pre_scaled_df = df.copy()
@@ -469,7 +469,7 @@ pre_scaled_df = df.copy()
 
 # ## scale non-binary features
 
-# In[33]:
+# In[462]:
 
 
 #remove price
@@ -509,7 +509,7 @@ df[columns_to_scale] = scaler.fit_transform(df[columns_to_scale])
 
 # ## create a function that will run through the different models and once all values are statistically significant return the model information
 
-# In[35]:
+# In[464]:
 
 
 #set the random seed
@@ -699,7 +699,7 @@ x_test_int = sm.add_constant(x_test, has_constant='add')
 #     i += 1
 
 
-# In[37]:
+# In[466]:
 
 
 #x_vif_train.columns
@@ -729,7 +729,7 @@ x_vif_train = ['const', 'host_is_superhost', 'bathrooms', 'bedrooms', 'beds',
        'reviews_per_month_missing']
 
 
-# In[39]:
+# In[468]:
 
 
 x_train_int = x_train_int[x_vif_train]
@@ -744,7 +744,7 @@ x_test_int = x_test_int[x_vif_train]
 
 # ## Build the Model
 
-# In[69]:
+# In[470]:
 
 
 def stepwise_selection(x_train, y_train, threshold = 0.05):
@@ -777,7 +777,7 @@ model_columns, model = stepwise_selection(x_train_int, y_train_log, threshold=0.
 
 # ## Test the Model
 
-# In[97]:
+# In[472]:
 
 
 #predict using the scaled data
@@ -814,7 +814,7 @@ rmse_test = root_mean_squared_error(y_test_log, y_pred_test)
 
 # ### Introduction
 
-# In[1063]:
+# In[474]:
 
 
 #only use the middle so that it is centralized -> little tricks
@@ -827,7 +827,7 @@ with col2:
 
 # ### General Facts about starting Dataset
 
-# In[1202]:
+# In[476]:
 
 
 #median, max, min, total parameters, and total neighborhoods in the model
@@ -855,7 +855,7 @@ with col5:
 
 # ### Split into Binary and Continuous Variables
 
-# In[1078]:
+# In[478]:
 
 
 columns = list(model.params.index)
@@ -876,7 +876,7 @@ for col in columns:
 #len(binary_col) + len(cont_col)
 
 
-# In[1122]:
+# In[480]:
 
 
 ##create the drop down options that are going to be referenced
@@ -892,7 +892,7 @@ with col2:
 
 # ### Variable Effects: Continous
 
-# In[1158]:
+# In[482]:
 
 
 #select_column = st.selectbox("Select a continuous column to view relationship to Airbnb Price", cont_col)
@@ -942,8 +942,8 @@ bar = alt.Chart(mean_df).mark_bar(size=64, opacity=1).encode(
 #create the trend line
 trend = alt.Chart(mean_df).mark_line(color='red', strokeWidth = 3).transform_regression(
     select_column, "price").encode(
-    x=alt.X(f"{select_column}:Q"),
-    y=alt.Y("price:Q")
+    x=alt.X(f"{select_column}:Q", axis = None),
+    y=alt.Y("price:Q", axis = None)
     )
 
 #combined the two
@@ -958,7 +958,7 @@ with col1:
 
 # ### Create a Chart to analyze binary columns
 
-# In[124]:
+# In[484]:
 
 
 #create the select column from the binary columns
@@ -989,7 +989,7 @@ with col2:
 
 # ### Print out the r2 and adj_r2 and rmse for the test and train
 
-# In[122]:
+# In[486]:
 
 
 col1, col2, col3, col4, col5, col6 = st.columns(6)
@@ -1028,7 +1028,7 @@ with col3:
 
 # ## Variables and there effects
 
-# In[420]:
+# In[488]:
 
 
 #overall effects
@@ -1070,7 +1070,7 @@ others_df['Variable Name'] = others_df['Variable Name'].str.removeprefix('room_'
 
 
 
-# In[426]:
+# In[490]:
 
 
 map_names = {
@@ -1092,7 +1092,7 @@ others_df = others_df[~others_df['Variable Name'].str.contains('review')]
 
 # ### Create the charts that will be used
 
-# In[428]:
+# In[492]:
 
 
 #create a function to create the different bar charts that will be used
@@ -1140,7 +1140,7 @@ st.altair_chart(other_chart)
 
 
 
-# In[120]:
+# In[494]:
 
 
 st.title(":orange[Conclusion]")
