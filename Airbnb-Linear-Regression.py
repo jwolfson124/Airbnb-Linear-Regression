@@ -850,7 +850,7 @@ with col4:
     st.metric('Total Variables Used in Model', value=len(model.params))
 
 with col5:
-    st.metric('Total Boston Neighborhoods used in Model', value = len([col for col in list(model.params.index) if 'neighbourhood' in col]))
+    st.metric('Total Boston Neighbourhoods used in Model', value = len([col for col in list(model.params.index) if 'neighbourhood' in col]))
 
 
 # ### Split into Binary and Continuous Variables
@@ -1016,13 +1016,13 @@ with col6:
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    st.write("The R-Squared measure explains the variance in the price the model explains. This means the model explains ~65% of the variation.")
+    st.write("The R-Squared measure explains the variance in the price the model explains. Therefore the model explains ~65% of the variation within the data.")
 
 with col2:
-    st.write("The Adjusted R-Squared penalizes for the number of predictors(columns) used in the model. These results show similar information as the R-Squared.")
+    st.write("The Adjusted R-Squared penalizes for the number of predictors(columns) used in the model. The findings reflect a similar measure of explanatory power as the R-squared statistic.")
 
 with col3:
-    st.write("The Root Mean Squared Error Test shows the average error size from the price. This results show that predictions errors across splits are consistent and usually around ~42.5%. This means the predicted values are normally within ~42.5% of the actual price.")
+    st.write("The Root Mean Squared Error Test shows the average error size from the price. These results show that predictions errors across splits are consistent around ~42.5%. This means the predicted values are normally within ~42.5% of the actual price.")
 
 
 
