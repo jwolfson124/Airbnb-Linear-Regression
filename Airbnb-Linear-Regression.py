@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[432]:
+# In[496]:
 
 
 ##import the entire dataset in a way where we can just add the next file in with no issues
@@ -86,7 +86,7 @@ print(report_df)
 
 
 
-# In[434]:
+# In[736]:
 
 
 # # Step 1: Set the folder path
@@ -142,7 +142,7 @@ print(report_df)
 
 # ## Identify columns that are not consistent and remove them from df
 
-# In[436]:
+# In[738]:
 
 
 #columns to drop
@@ -173,7 +173,7 @@ df = df.drop(columns=column_drop)#, inplace=True)
 
 # # Identify Columns that will not be useful to the algorythm
 
-# In[438]:
+# In[744]:
 
 
 #remove URL
@@ -210,7 +210,7 @@ original_df = df.copy()
 
 # ## Change any datetime columns to integer values
 
-# In[440]:
+# In[746]:
 
 
 #columns that need to be changed
@@ -227,15 +227,17 @@ small_df['calendar_last_scraped'] = small_df['calendar_last_scraped'].dt.strftim
 
 
 
-# In[550]:
+# In[748]:
 
 
-
+#create a bathroom / bedroom ratio
+small_df['bathrooms_per_bedrooms'] = np.where(small_df['bedrooms'] > 0, small_df['bathrooms'] / small_df['bedrooms'], np.nan)
+small_df['bathrooms_per_beds'] = np.where(small_df['beds'] > 0, small_df['bathrooms'] / small_df['beds'], np.nan)
 
 
 # ## Change categorical values into dummy variables
 
-# In[442]:
+# In[750]:
 
 
 df = small_df.copy()
@@ -263,7 +265,7 @@ print(df['amenities'])
 
 # ## Use Total Number of Amenities Instead of Individual
 
-# In[444]:
+# In[752]:
 
 
 #the ast.literal_eval turns the string that holds a list into just a list of the different amenities
@@ -275,7 +277,7 @@ df['amenities'] = df['amenities'].apply(ast.literal_eval).apply(lambda x: ','.jo
 #df_dummies
 
 
-# In[446]:
+# In[754]:
 
 
 def count_amenities(amenities_str):
@@ -306,7 +308,7 @@ df['amenities'] = df['amenities'].apply(count_amenities)
 
 # ## Get dummy values and apply prefix to help with organizatioon
 
-# In[448]:
+# In[756]:
 
 
 #create a list of dummy columns
@@ -322,7 +324,7 @@ dummy_values = pd.get_dummies(df[dummy_cols],prefix=prefix, dtype='uint8', spars
 df = pd.concat([df, dummy_values], axis=1).drop(columns=dummy_cols)
 
 
-# In[450]:
+# In[758]:
 
 
 timeline_cols = df.columns[df.columns.str.contains('calendar')]
@@ -337,7 +339,7 @@ timeline_cols = df.columns[df.columns.str.contains('calendar')]
 
 # ## identify missing data and how to deal with it the means, medians, max, and min to understand how similar the information is
 
-# In[452]:
+# In[760]:
 
 
 #remove all instances of missing price
@@ -397,7 +399,7 @@ for quarter in timeline_cols:
 
 # ## Based on the above analysis it makes sense to impute the data using the median values for each calendar time period year
 
-# In[454]:
+# In[762]:
 
 
 #create the columns that will hold the missing values and mark them before imputing the median
@@ -432,7 +434,7 @@ for quarter in timeline_cols:
 
 # ## turn all the sparse values into integer or float values
 
-# In[456]:
+# In[764]:
 
 
 #check the dtypes and confirm there are no strings
@@ -449,7 +451,7 @@ for col in column_list:
 
 # ## remove major outliers
 
-# In[458]:
+# In[766]:
 
 
 #create the upper and lower bounds
@@ -461,21 +463,27 @@ mask = (df['price'] >= lower_bound) & (df['price'] <= upper_bound)
 df = df[mask].copy()
 
 
-# In[460]:
+# In[768]:
 
 
 pre_scaled_df = df.copy()
 
 
+# In[604]:
+
+
+
+
+
 # ## scale non-binary features
 
-# In[462]:
+# In[770]:
 
 
 #remove price
 
 columns_to_check = [col for col in df if col != 'price']
-
+#print(columns_to_check)
 #find the min and max for all columns
 minis = df[columns_to_check].min()
 maxis = df[columns_to_check].max()
@@ -509,7 +517,7 @@ df[columns_to_scale] = scaler.fit_transform(df[columns_to_scale])
 
 # ## create a function that will run through the different models and once all values are statistically significant return the model information
 
-# In[464]:
+# In[772]:
 
 
 #set the random seed
@@ -539,7 +547,7 @@ x_test_int = sm.add_constant(x_test, has_constant='add')
 
 # ## Test for Multi Colinearity - Takes to Long to Run on Streamlit so output of code manually entered
 
-# In[428]:
+# In[694]:
 
 
 # def vif_calc(x_train_int, exclude_const = True):
@@ -574,7 +582,7 @@ x_test_int = sm.add_constant(x_test, has_constant='add')
 ## Identify issues and rerun VIF again
 
 
-# In[483]:
+# In[696]:
 
 
 # columns_to_drop = []
@@ -633,15 +641,15 @@ x_test_int = sm.add_constant(x_test, has_constant='add')
 
 # ## After Making initial edits to alter the nan and inf numbers run until there is no more multicolinearity
 
-# In[432]:
+# In[698]:
 
 
-#x_vif_train = x_train_int.drop(columns=columns_to_drop, errors="ignore").copy()
+# x_vif_train = x_train_int.drop(columns=columns_to_drop, errors="ignore").copy()
 
 # i = 1
 # while True:
 #     # recompute VIFs (make sure your vif_calc drops 'const' internally)
-#     vif_dict = vif_calc(x_vif_train, drop_const=True)
+#     vif_dict = vif_calc(x_vif_train, exclude_const=True)
 
 #     # if nothing left to evaluate, stop
 #     if not vif_dict:
@@ -665,11 +673,11 @@ x_test_int = sm.add_constant(x_test, has_constant='add')
 
 #     # drop it and loop
 #     x_vif_train = x_vif_train.drop(columns=[col_max], errors="ignore")
-#     st.write(f"Removed {col_max} with VIF {vif_max:.2f} (iteration {i})")
+#     print(f"Removed {col_max} with VIF {vif_max:.2f} (iteration {i})")
 #     i += 1
 
 
-# In[434]:
+# In[700]:
 
 
 # x_vif_train = x_train_int.drop(columns=columns_to_drop).copy()
@@ -695,41 +703,43 @@ x_test_int = sm.add_constant(x_test, has_constant='add')
 #     #remove the column from the x_vif_train columns
 #     x_vif_train = x_vif_train.drop(drop_col, axis = 1)
 #     print(f"Removed {drop_col} with a VIF of {max_vif}")
-#     st.write(f"VIF Iteration {i} complete!")
+#     print(f"VIF Iteration {i} complete!")
 #     i += 1
 
 
-# In[466]:
+# In[786]:
 
 
 #x_vif_train.columns
 
-x_vif_train = ['const', 'host_is_superhost', 'bathrooms', 'bedrooms', 'beds',
+x_vif_train = ['const', 'host_is_superhost', 'accommodates', 'bathrooms', 'bedrooms',
        'amenities', 'minimum_nights', 'maximum_nights', 'availability_365',
        'number_of_reviews', 'review_scores_rating',
        'review_scores_cleanliness', 'review_scores_checkin',
        'review_scores_communication', 'review_scores_value',
        'instant_bookable', 'calculated_host_listings_count',
-       'reviews_per_month', 'host_since_years', 'neighbourhood_Allston',
-       'neighbourhood_Back Bay', 'neighbourhood_Bay Village',
-       'neighbourhood_Beacon Hill', 'neighbourhood_Brighton',
-       'neighbourhood_Charlestown', 'neighbourhood_Chinatown',
-       'neighbourhood_Dorchester', 'neighbourhood_Downtown',
-       'neighbourhood_East Boston', 'neighbourhood_Fenway',
-       'neighbourhood_Hyde Park', 'neighbourhood_Jamaica Plain',
-       'neighbourhood_Leather District', 'neighbourhood_Longwood Medical Area',
-       'neighbourhood_Mattapan', 'neighbourhood_Mission Hill',
-       'neighbourhood_North End', 'neighbourhood_Roslindale',
-       'neighbourhood_Roxbury', 'neighbourhood_South Boston Waterfront',
-       'neighbourhood_South End', 'neighbourhood_West End',
-       'neighbourhood_West Roxbury', 'room_Hotel room', 'room_Private room',
-       'room_Shared room', 'calendar_December - 2024', 'calendar_March - 2025',
+       'reviews_per_month', 'host_since_years', 'bathrooms_per_beds',
+       'neighbourhood_Allston', 'neighbourhood_Back Bay',
+       'neighbourhood_Bay Village', 'neighbourhood_Beacon Hill',
+       'neighbourhood_Brighton', 'neighbourhood_Charlestown',
+       'neighbourhood_Chinatown', 'neighbourhood_Dorchester',
+       'neighbourhood_Downtown', 'neighbourhood_East Boston',
+       'neighbourhood_Fenway', 'neighbourhood_Hyde Park',
+       'neighbourhood_Jamaica Plain', 'neighbourhood_Leather District',
+       'neighbourhood_Longwood Medical Area', 'neighbourhood_Mattapan',
+       'neighbourhood_Mission Hill', 'neighbourhood_North End',
+       'neighbourhood_Roslindale', 'neighbourhood_Roxbury',
+       'neighbourhood_South Boston Waterfront', 'neighbourhood_South End',
+       'neighbourhood_West End', 'neighbourhood_West Roxbury',
+       'room_Hotel room', 'room_Private room', 'room_Shared room',
+       'calendar_December - 2024', 'calendar_March - 2025',
        'calendar_September - 2024', 'host_response_rate_missing',
        'host_acceptance_rate_missing', 'beds_missing',
-       'reviews_per_month_missing']
+       'reviews_per_month_missing', 'bathrooms_per_bedrooms_missing',
+       'bathrooms_per_beds_missing']
 
 
-# In[468]:
+# In[788]:
 
 
 x_train_int = x_train_int[x_vif_train]
@@ -744,7 +754,7 @@ x_test_int = x_test_int[x_vif_train]
 
 # ## Build the Model
 
-# In[470]:
+# In[790]:
 
 
 def stepwise_selection(x_train, y_train, threshold = 0.05):
@@ -777,7 +787,7 @@ model_columns, model = stepwise_selection(x_train_int, y_train_log, threshold=0.
 
 # ## Test the Model
 
-# In[472]:
+# In[792]:
 
 
 #predict using the scaled data
@@ -798,6 +808,14 @@ adj_r2_test = 1 - (1-r2_test) *((n-1) / (n - k - 1))
 rmse_test = root_mean_squared_error(y_test_log, y_pred_test)
 
 
+# In[794]:
+
+
+print(r2_train, r2_test)
+print(adj_r2_train, adj_r2_test)
+print(rmse_train, rmse_test)
+
+
 # In[ ]:
 
 
@@ -814,7 +832,7 @@ rmse_test = root_mean_squared_error(y_test_log, y_pred_test)
 
 # ### Introduction
 
-# In[474]:
+# In[714]:
 
 
 #only use the middle so that it is centralized -> little tricks
@@ -827,7 +845,7 @@ with col2:
 
 # ### General Facts about starting Dataset
 
-# In[476]:
+# In[716]:
 
 
 #median, max, min, total parameters, and total neighborhoods in the model
@@ -855,7 +873,7 @@ with col5:
 
 # ### Split into Binary and Continuous Variables
 
-# In[478]:
+# In[718]:
 
 
 columns = list(model.params.index)
@@ -876,7 +894,7 @@ for col in columns:
 #len(binary_col) + len(cont_col)
 
 
-# In[480]:
+# In[720]:
 
 
 ##create the drop down options that are going to be referenced
@@ -892,7 +910,7 @@ with col2:
 
 # ### Variable Effects: Continous
 
-# In[482]:
+# In[722]:
 
 
 #select_column = st.selectbox("Select a continuous column to view relationship to Airbnb Price", cont_col)
@@ -958,7 +976,7 @@ with col1:
 
 # ### Create a Chart to analyze binary columns
 
-# In[484]:
+# In[724]:
 
 
 #create the select column from the binary columns
@@ -989,7 +1007,7 @@ with col2:
 
 # ### Print out the r2 and adj_r2 and rmse for the test and train
 
-# In[486]:
+# In[805]:
 
 
 col1, col2, col3, col4, col5, col6 = st.columns(6)
@@ -1016,7 +1034,7 @@ with col6:
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    st.write("The R-Squared measure explains the variance in the price the model explains. Therefore the model explains ~65% of the variation within the data.")
+    st.write("The R-Squared measure explains the variance in the price the model explains. Therefore the model explains ~67% of the variation within the data.")
 
 with col2:
     st.write("The Adjusted R-Squared penalizes for the number of predictors(columns) used in the model. The findings reflect a similar measure of explanatory power as the R-squared statistic.")
@@ -1028,7 +1046,7 @@ with col3:
 
 # ## Variables and there effects
 
-# In[488]:
+# In[807]:
 
 
 #overall effects
@@ -1070,7 +1088,7 @@ others_df['Variable Name'] = others_df['Variable Name'].str.removeprefix('room_'
 
 
 
-# In[490]:
+# In[809]:
 
 
 map_names = {
@@ -1092,7 +1110,7 @@ others_df = others_df[~others_df['Variable Name'].str.contains('review')]
 
 # ### Create the charts that will be used
 
-# In[492]:
+# In[732]:
 
 
 #create a function to create the different bar charts that will be used
@@ -1140,7 +1158,7 @@ st.altair_chart(other_chart)
 
 
 
-# In[494]:
+# In[734]:
 
 
 st.title(":orange[Conclusion]")
