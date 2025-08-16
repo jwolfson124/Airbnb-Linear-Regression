@@ -1110,21 +1110,39 @@ others_df = others_df[~others_df['Variable Name'].str.contains('review')]
 
 # ### Create the charts that will be used
 
-# In[811]:
+# In[819]:
 
 
 #create a function to create the different bar charts that will be used
-def create_bar(df, x, y, colors = 'blues'):
-    bar = alt.Chart(df).mark_bar(size=64, opacity=1).encode(
-     x=alt.X(f"{x}:O", 
-             title=x,
-            sort = alt.SortField(field=y, order='ascending')),
-     y=alt.Y(f"{y}:Q", title=y),
-     tooltip=[alt.Tooltip(f"{x}:O"), alt.Tooltip(f"{y}:Q", format=",.0f")],
-     color=alt.Color(f"{y}:Q", scale=alt.Scale(scheme=colors),legend=None)).properties(width=650, height=400,
-                                                                                      padding={'left': 10, 'right':10, 'top':10, 'bottom':40})
+import altair as alt
 
-    return bar
+def create_bar(df, x, y, colors='blues'):
+    x_axis = alt.Axis(
+        title=x,
+        labelAngle=30,        #tilt to the left so that we can read it better
+        labelAlign='left',
+        labelBaseline='middle',
+        labelPadding=8,
+        labelLimit=0            # no limit so that the longer neighbourhoods and values can be fully read
+    )
+
+    chart = (
+        alt.Chart(df)
+        .mark_bar(size=64, opacity=1) 
+        .encode(
+            # Use :N for categorical labels; switch to :O only if x is truly ordinal
+            x=alt.X(f'{x}:N', axis=x_axis, sort='-y'),
+            y=alt.Y(f'{y}:Q', title=y),
+            tooltip=[alt.Tooltip(f'{x}:N', title=x),
+                     alt.Tooltip(f'{y}:Q', title=y, format=",.0f")],
+            color=alt.Color(f'{y}:Q', scale=alt.Scale(scheme=colors), legend=None)
+        )
+        .properties(width=650, height=400,
+                    padding={'left': 20, 'right': 10, 'top': 10, 'bottom': 90})
+        .configure_view(stroke=None)  # optional: remove outer border (nice in dark mode)
+    )
+    return chart
+
 
 #create the different charts to visualize effect
 neighbourhood_chart = create_bar(neighbourhood_df, 'Variable Name', 'Percent Effect')
