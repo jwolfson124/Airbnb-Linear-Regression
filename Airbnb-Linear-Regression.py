@@ -1110,7 +1110,7 @@ others_df = others_df[~others_df['Variable Name'].str.contains('review')]
 
 # ### Create the charts that will be used
 
-# In[819]:
+# In[821]:
 
 
 #create a function to create the different bar charts that will be used
@@ -1119,8 +1119,8 @@ import altair as alt
 def create_bar(df, x, y, colors='blues'):
     x_axis = alt.Axis(
         title=x,
-        labelAngle=30,        #tilt to the left so that we can read it better
-        labelAlign='left',
+        labelAngle=15,        #tilt to the left so that we can read it better
+        labelAlign='right',
         labelBaseline='middle',
         labelPadding=8,
         labelLimit=0            # no limit so that the longer neighbourhoods and values can be fully read
@@ -1131,7 +1131,7 @@ def create_bar(df, x, y, colors='blues'):
         .mark_bar(size=64, opacity=1) 
         .encode(
             # Use :N for categorical labels; switch to :O only if x is truly ordinal
-            x=alt.X(f'{x}:N', axis=x_axis, sort='-y'),
+            x=alt.X(f'{x}:N', axis=x_axis, sort='y'),
             y=alt.Y(f'{y}:Q', title=y),
             tooltip=[alt.Tooltip(f'{x}:N', title=x),
                      alt.Tooltip(f'{y}:Q', title=y, format=",.0f")],
