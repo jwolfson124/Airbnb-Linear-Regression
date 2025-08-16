@@ -1110,38 +1110,23 @@ others_df = others_df[~others_df['Variable Name'].str.contains('review')]
 
 # ### Create the charts that will be used
 
-# In[821]:
+# In[840]:
 
 
 #create a function to create the different bar charts that will be used
-import altair as alt
+def create_bar(df, x, y, colors = 'blues'):
+    bar = alt.Chart(df).mark_bar(size=64, opacity=1).encode(
+        x=alt.X(f"{x}:O",
+                axis=alt.Axis(title=x, labelLimit=0),
+                title=x,
+                sort=alt.SortField(field=y, order='ascending')),
+        y=alt.Y(f"{y}:Q", title=y),
+        tooltip=[alt.Tooltip(f"{x}:O"), alt.Tooltip(f"{y}:Q", format=",.0f")],
+        color=alt.Color(f"{y}:Q", scale=alt.Scale(scheme=colors), legend=None)
+    ).properties(width=650, height=400,
+                 padding={'left': 10, 'right':10, 'top':10, 'bottom':40})
 
-def create_bar(df, x, y, colors='blues'):
-    x_axis = alt.Axis(
-        title=x,
-        labelAngle=15,        #tilt to the left so that we can read it better
-        labelAlign='right',
-        labelBaseline='middle',
-        labelPadding=8,
-        labelLimit=0            # no limit so that the longer neighbourhoods and values can be fully read
-    )
-
-    chart = (
-        alt.Chart(df)
-        .mark_bar(size=64, opacity=1) 
-        .encode(
-            # Use :N for categorical labels; switch to :O only if x is truly ordinal
-            x=alt.X(f'{x}:N', axis=x_axis, sort='y'),
-            y=alt.Y(f'{y}:Q', title=y),
-            tooltip=[alt.Tooltip(f'{x}:N', title=x),
-                     alt.Tooltip(f'{y}:Q', title=y, format=",.0f")],
-            color=alt.Color(f'{y}:Q', scale=alt.Scale(scheme=colors), legend=None)
-        )
-        .properties(width=650, height=400,
-                    padding={'left': 20, 'right': 10, 'top': 10, 'bottom': 90})
-        .configure_view(stroke=None)  # optional: remove outer border (nice in dark mode)
-    )
-    return chart
+    return bar
 
 
 #create the different charts to visualize effect
@@ -1177,10 +1162,10 @@ st.altair_chart(other_chart)
 
 
 
-# In[734]:
+# In[831]:
 
 
 st.title(":orange[Conclusion]")
-st.write("Bottom line: this model is doing great with the data we’ve got. It explains about two-thirds of price variation (R² 0.645 train / 0.659 test), and even after penalizing for feature count the story holds (adj-R² 0.643 / 0.653), so we’re capturing real signal—not just fitting noise. Errors on the log scale are steady at 0.384 (train) and 0.366 (test), roughly a ~47% / ~44% typical gap, which is solid given we’re mostly using host-provided listing details and not richer property data (condition, square footage, comps, events). The test slightly edging the train = nice generalization. Overall, given the available data, this model reliably captures how listing features affect nightly price in Boston and does it with stable, well-generalized, and consistent performance!")
+st.write(f"Bottom line: this model is doing great with the data we’ve got. It explains about two-thirds of price variation (R² {r2_train} train / {r2_test} test), and even after penalizing for feature count the story holds (adj-R² {adj_r2_train} / {adj_r2_test}), so we’re capturing real signal—not just fitting noise. Errors on the log scale are steady at {rmse_train} (train) and {rmse_test} (test), roughly a 42.5% typical gap, which is solid given we’re mostly using host-provided listing details and not richer property data (condition, square footage, comps, events). The test slightly edging the train = nice generalization. Overall, given the available data, this model reliably captures how listing features affect nightly price in Boston and does it with stable, well-generalized, and consistent performance!")
 st.write('Link to Data Source: https://insideairbnb.com/get-the-data/')
 
