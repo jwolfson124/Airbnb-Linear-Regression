@@ -1156,16 +1156,21 @@ st.altair_chart(other_chart)
 
 
 
-# In[ ]:
+# In[862]:
 
 
+#create one set of the code that rounds all values so that the message printed is easier to read
+r2_train, r2_test, adj_r2_train, adj_r2_test, rmse_train, rmse_test = [
+    round(float(v), 2)
+    for v in [r2_train, r2_test, adj_r2_train, adj_r2_test, rmse_train, rmse_test]
+]
 
 
-
-# In[831]:
+# In[860]:
 
 
 st.title(":orange[Conclusion]")
 st.write(f"Bottom line: this model is doing great with the data we’ve got. It explains about two-thirds of price variation (R² {r2_train} train / {r2_test} test), and even after penalizing for feature count the story holds (adj-R² {adj_r2_train} / {adj_r2_test}), so we’re capturing real signal—not just fitting noise. Errors on the log scale are steady at {rmse_train} (train) and {rmse_test} (test), roughly a 42.5% typical gap, which is solid given we’re mostly using host-provided listing details and not richer property data (condition, square footage, comps, events). The test slightly edging the train = nice generalization. Overall, given the available data, this model reliably captures how listing features affect nightly price in Boston and does it with stable, well-generalized, and consistent performance!")
 st.write('Link to Data Source: https://insideairbnb.com/get-the-data/')
+#print(f"Bottom line: this model is doing great with the data we’ve got. It explains about two-thirds of price variation (R² {r2_train} train / {r2_test} test), and even after penalizing for feature count the story holds (adj-R² {adj_r2_train} / {adj_r2_test}), so we’re capturing real signal—not just fitting noise. Errors on the log scale are steady at {rmse_train} (train) and {rmse_test} (test), roughly a 42.5% typical gap, which is solid given we’re mostly using host-provided listing details and not richer property data (condition, square footage, comps, events). The test slightly edging the train = nice generalization. Overall, given the available data, this model reliably captures how listing features affect nightly price in Boston and does it with stable, well-generalized, and consistent performance!")
 
