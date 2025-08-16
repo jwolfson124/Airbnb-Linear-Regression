@@ -1034,7 +1034,7 @@ with col6:
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    st.write("The R-Squared measure explains the variance in the price the model explains. Therefore the model explains ~67% of the variation within the data.")
+    st.write("The R-Squared measure explains the variance in the price the model explains. Therefore the model explains ~66% of the variation within the data.")
 
 with col2:
     st.write("The Adjusted R-Squared penalizes for the number of predictors(columns) used in the model. The findings reflect a similar measure of explanatory power as the R-squared statistic.")
@@ -1110,7 +1110,7 @@ others_df = others_df[~others_df['Variable Name'].str.contains('review')]
 
 # ### Create the charts that will be used
 
-# In[732]:
+# In[811]:
 
 
 #create a function to create the different bar charts that will be used
@@ -1121,7 +1121,8 @@ def create_bar(df, x, y, colors = 'blues'):
             sort = alt.SortField(field=y, order='ascending')),
      y=alt.Y(f"{y}:Q", title=y),
      tooltip=[alt.Tooltip(f"{x}:O"), alt.Tooltip(f"{y}:Q", format=",.0f")],
-     color=alt.Color(f"{y}:Q", scale=alt.Scale(scheme=colors),legend=None)).properties(width=650, height=400)
+     color=alt.Color(f"{y}:Q", scale=alt.Scale(scheme=colors),legend=None)).properties(width=650, height=400,
+                                                                                      padding={'left': 10, 'right':10, 'top':10, 'bottom':40})
 
     return bar
 
